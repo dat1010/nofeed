@@ -2,7 +2,6 @@
   "name": "no-feed",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://goapii-goapi-lrscepapuv0e-1520044824.us-east-1.elb.amazonaws.com",
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -10,8 +9,6 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.126",
-    "@types/react": "^19.1.1",
-    "@types/react-dom": "^19.1.2",
     "axios": "^1.8.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -43,5 +40,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2"
   }
 }

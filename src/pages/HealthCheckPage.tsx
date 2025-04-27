@@ -5,7 +5,6 @@ import api from "../services/api";
 
 interface HealthResponse {
   status: string;
-  // Add more properties here if your healthcheck returns additional data
 }
 
 const HealthCheckPage: React.FC = () => {
