@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
 
+// Helper to get a cookie value by name - moved outside component
+function getCookie(name: string): string | null {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? match[2] : null;
+}
+
 const LandingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [idToken, setIdToken] = useState<string | null>(null);
@@ -8,11 +14,6 @@ const LandingPage: React.FC = () => {
   useEffect(() => {
     // Only redirect if we're on the landing page, not already on /home
     if (window.location.pathname !== "/home") {
-      // Helper to get a cookie value by name
-      function getCookie(name: string): string | null {
-        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-        return match ? match[2] : null;
-      }
       const token = getCookie("id_token");
       if (token) {
         setIdToken(token);
