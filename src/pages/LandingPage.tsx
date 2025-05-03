@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Helper to get a cookie value by name - moved outside component
 function getCookie(name: string): string | null {
@@ -8,8 +9,8 @@ function getCookie(name: string): string | null {
 
 const LandingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
-  // Removed unused state variable: idToken
-
+  const navigate = useNavigate();
+  
   // Redirect to /home if id_token cookie is present and accessible via JS
   useEffect(() => {
     console.log("LandingPage rendered at path:", window.location.pathname);
@@ -20,12 +21,12 @@ const LandingPage: React.FC = () => {
       const token = getCookie("id_token");
       if (token) {
         console.log("Found token, redirecting to /home");
-        window.location.href = "/home";
+        navigate("/home");
       }
     }
     // Log the pathname to debug
     console.log("Current pathname:", window.location.pathname);
-  }, []);
+  }, [navigate]);
 
   const handleLogin = async () => {
     setIsLoading(true);
