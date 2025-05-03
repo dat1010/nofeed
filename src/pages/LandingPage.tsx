@@ -1,7 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const LandingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
+
+  // Redirect to /home if id_token cookie is present
+  useEffect(() => {
+    const hasIdToken = document.cookie.split(";").some((c) => c.trim().startsWith("id_token="));
+    if (hasIdToken) {
+      window.location.href = "/home";
+    }
+  }, []);
 
   const handleLogin = async () => {
     setIsLoading(true);
