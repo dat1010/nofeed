@@ -2,13 +2,23 @@ import React, { useState, useEffect } from "react";
 
 const LandingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [idToken, setIdToken] = useState<string | null>(null);
 
-  // Redirect to /home if id_token cookie is present
+  // Redirect to /home if id_token cookie is present and accessible via JS
   useEffect(() => {
-    const hasIdToken = document.cookie.split(";").some((c) => c.trim().startsWith("id_token="));
-    console.log("Cookie check:", hasIdToken);
-    if (hasIdToken) {
-      window.location.href = "/home";
+    // Only redirect if we're on the landing page, not already on /home
+    if (window.location.pathname !== "/home") {
+      // Helper to get a cookie value by name
+      function getCookie(name: string): string | null {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+      }
+      const token = getCookie("id_token");
+      if (token) {
+        setIdToken(token);
+        // Use relative URL to avoid domain issues
+        window.location.href = "/home";
+      }
     }
   }, []);
 
