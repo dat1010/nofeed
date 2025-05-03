@@ -6,7 +6,7 @@ const LandingPage: React.FC = () => {
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      window.location.href = "/api/login";
+      window.location.href = "https://api.nofeed.zone/api/login";
     } catch (error) {
       console.error("Login error:", error);
       setIsLoading(false);
@@ -16,7 +16,7 @@ const LandingPage: React.FC = () => {
   const handleSignup = async () => {
     setIsLoading(true);
     try {
-      window.location.href = "/api/login?mode=signup";
+      window.location.href = "https://api.nofeed.zone/api/login";
     } catch (error) {
       console.error("Signup error:", error);
       setIsLoading(false);
