@@ -6,6 +6,7 @@ const LandingPage: React.FC = () => {
   // Redirect to /home if id_token cookie is present
   useEffect(() => {
     const hasIdToken = document.cookie.split(";").some((c) => c.trim().startsWith("id_token="));
+    console.log("Cookie check:", hasIdToken);
     if (hasIdToken) {
       window.location.href = "/home";
     }
