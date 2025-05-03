@@ -8,7 +8,7 @@ function getCookie(name: string): string | null {
 
 const LandingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [idToken, setIdToken] = useState<string | null>(null);
+  // Removed unused state variable: idToken
 
   // Redirect to /home if id_token cookie is present and accessible via JS
   useEffect(() => {
@@ -16,8 +16,7 @@ const LandingPage: React.FC = () => {
     if (window.location.pathname !== "/home") {
       const token = getCookie("id_token");
       if (token) {
-        setIdToken(token);
-        // Use relative URL to avoid domain issues
+        // Removed setting unused state
         window.location.href = "/home";
       }
     }
