@@ -13,19 +13,13 @@ const LandingPage: React.FC = () => {
   
   // Redirect to /home if id_token cookie is present and accessible via JS
   useEffect(() => {
-    console.log("LandingPage rendered at path:", window.location.pathname);
-    console.log("Cookie check:", document.cookie);
-    
     // Only redirect if we're exactly on the root path
     if (window.location.pathname === "/" || window.location.pathname === "") {
       const token = getCookie("id_token");
       if (token) {
-        console.log("Found token, redirecting to /home");
         navigate("/home");
       }
     }
-    // Log the pathname to debug
-    console.log("Current pathname:", window.location.pathname);
   }, [navigate]);
 
   const handleLogin = async () => {
