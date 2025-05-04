@@ -16,11 +16,14 @@ const PostList: React.FC = () => {
   const fetchPosts = async () => {
     try {
       const response = await api.get("/posts");
-      setPosts(response.data);
+      // Ensure we have a valid array of posts
+      const postsData = response.data || [];
+      setPosts(Array.isArray(postsData) ? postsData : []);
       setError(null);
     } catch (error) {
       console.error("Error fetching posts:", error);
       setError("Failed to load posts");
+      setPosts([]); // Ensure posts is an empty array on error
     } finally {
       setIsLoading(false);
     }
@@ -46,9 +49,12 @@ const PostList: React.FC = () => {
     );
   }
 
+  // Ensure posts is always an array before mapping
+  const validPosts = Array.isArray(posts) ? posts : [];
+
   return (
     <div className="posts">
-      {posts.map((post) => (
+      {validPosts.map((post) => (
         <div key={post.id} className="box">
           <div className="content">
             <p>{post.content}</p>
@@ -58,7 +64,7 @@ const PostList: React.FC = () => {
           </div>
         </div>
       ))}
-      {posts.length === 0 && (
+      {validPosts.length === 0 && (
         <div className="has-text-centered has-text-grey">
           No posts yet. Be the first to post something!
         </div>
