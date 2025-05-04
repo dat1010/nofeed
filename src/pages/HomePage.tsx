@@ -1,45 +1,10 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../services/api";
+import Navbar from "../components/Navbar";
 
 const HomePage: React.FC = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      // Call the backend logout endpoint
-      await api.get('/logout');
-
-      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-      
-      // Navigate to landing page
-      navigate("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-      // Even if the API call fails, we should still clear the token and redirect
-      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-      navigate("/");
-    }
-  };
-
   return (
     <>
-      <nav className="navbar is-light" role="navigation" aria-label="main navigation">
-        <div className="navbar-brand">
-          <span className="navbar-item has-text-weight-bold">NoFeed</span>
-        </div>
-        <div className="navbar-menu">
-          <div className="navbar-end">
-            <div className="navbar-item">
-              <button className="button is-danger" onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
       <div className="container mt-5">
         <h1 className="title is-2">Welcome to NoFeed Home</h1>
         <p className="subtitle">A place to explore</p>
