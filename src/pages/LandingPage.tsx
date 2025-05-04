@@ -1,23 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api"; // adjust path as needed
-
-// Helper to get a cookie value by name - moved outside component
-function getCookie(name: string): string | null {
-  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-  return match ? match[2] : null;
-}
-
-function deleteCookie(name: string) {
-  // Remove for root path
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-  // Remove for current path
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
-  // Remove for domain (if your app is on a subdomain)
-  const hostname = window.location.hostname;
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${hostname};`;
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.${hostname};`;
-}
+import { getCookie } from "../utils/cookies";
 
 const LandingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
