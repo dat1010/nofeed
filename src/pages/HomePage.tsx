@@ -1,14 +1,28 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Remove the id_token cookie for root path and current path
-    document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      // Call the backend logout endpoint
+      await api.post('/logout');
+      
+      // Remove the id_token cookie for root path and current path
+      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      
+      // Navigate to landing page
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Even if the API call fails, we should still clear the token and redirect
+      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      navigate("/");
+    }
   };
 
   return (
