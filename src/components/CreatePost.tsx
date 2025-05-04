@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from "../services/api";
+import { getCookie } from "../utils/cookies";
 
 interface CreatePostProps {
   onPostCreated: () => void;
@@ -21,11 +22,24 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
     setIsSubmitting(true);
     try {
       const title = generateTitle(content);
-      await api.post("/posts", {
-        title,
-        content,
-        published: true
-      });
+      const token = getCookie("id_token");
+      
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      await api.post("/posts", 
+        {
+          title,
+          content,
+          published: true
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
       setContent("");
       onPostCreated(); // Notify parent that a new post was created
     } catch (error) {
