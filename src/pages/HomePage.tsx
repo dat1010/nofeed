@@ -8,9 +8,8 @@ const HomePage: React.FC = () => {
   const handleLogout = async () => {
     try {
       // Call the backend logout endpoint
-      await api.post('/logout');
-      
-      // Remove the id_token cookie for root path and current path
+      await api.get('/logout');
+
       document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
       
