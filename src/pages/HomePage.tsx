@@ -5,8 +5,9 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Remove the id_token cookie by setting its expiry to the past
+    // Remove the id_token cookie for root path and current path
     document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     navigate("/");
   };
 
