@@ -29,7 +29,7 @@ const HomePage: React.FC = () => {
       </nav>
       <div className="container mt-5">
         <h1 className="title is-2">Welcome to NoFeed Home</h1>
-        <p className="subtitle">Your distraction-free zone</p>
+        <p className="subtitle">A place to explore</p>
         
         {/* Add your home page content here */}
       </div>
