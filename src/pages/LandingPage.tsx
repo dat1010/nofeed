@@ -42,7 +42,7 @@ const LandingPage: React.FC = () => {
       <div className="hero-body">
         <div className="container has-text-centered">
           <h1 className="title is-2">Welcome to NoFeed</h1>
-          <p className="subtitle">A distraction-free zone for focused productivity and mindful browsing.</p>
+          <p className="subtitle">An experimental social network.</p>
           
           <div className="buttons is-centered mt-5">
             <button 
