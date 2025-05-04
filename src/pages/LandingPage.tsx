@@ -54,16 +54,6 @@ const LandingPage: React.FC = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await api.post("/logout"); // If your backend supports this
-    } catch (e) {
-      // ignore errors
-    }
-    deleteCookie("id_token");
-    window.location.href = "/";
-  };
-
   return (
     <section className="hero is-fullheight">
       <div className="hero-body">
