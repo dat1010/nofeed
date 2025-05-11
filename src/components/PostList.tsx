@@ -15,7 +15,7 @@ const PostList: React.FC = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await api.get("/posts");
+      const response = await api.get("/posts?published=true");
       // Ensure we have a valid array of posts
       const postsData = response.data || [];
       setPosts(Array.isArray(postsData) ? postsData : []);
