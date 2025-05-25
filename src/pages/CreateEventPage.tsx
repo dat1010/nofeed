@@ -36,6 +36,14 @@ const CreateEventPage: React.FC = () => {
     scheduleTime: '12:00'
   });
 
+  // Convert local time to UTC
+  const convertToUTC = (localTime: string): number => {
+    const [hours, minutes] = localTime.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+    return date.getUTCHours();
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
@@ -47,9 +55,9 @@ const CreateEventPage: React.FC = () => {
       // If changing preset schedule or time, update the actual schedule
       if (name === 'presetSchedule' || name === 'scheduleTime') {
         if (newData.scheduleType === 'preset') {
-          const [hours] = newData.scheduleTime.split(':');
+          const utcHour = convertToUTC(newData.scheduleTime);
           const scheduleTemplate = PRESET_SCHEDULES[newData.presetSchedule as keyof typeof PRESET_SCHEDULES].value;
-          newData.schedule = scheduleTemplate.replace('{hour}', hours);
+          newData.schedule = scheduleTemplate.replace('{hour}', utcHour.toString());
         }
         if (name === 'presetSchedule') {
           newData.scheduleType = value === 'custom' ? 'custom' : 'preset';
@@ -190,7 +198,7 @@ const CreateEventPage: React.FC = () => {
                             required
                           />
                         </div>
-                        <p className="help">Select the time when the event should run</p>
+                        <p className="help">Select the time when the event should run (local time)</p>
                       </div>
                     )}
                     
@@ -208,7 +216,7 @@ const CreateEventPage: React.FC = () => {
                   </div>
                   <p className="help">
                     {formData.scheduleType === 'custom' 
-                      ? 'Format: minute hour day month day-of-week year'
+                      ? 'Format: minute hour day month day-of-week year (in UTC)'
                       : 'Select a preset schedule and time, or choose custom for more options'}
                   </p>
                 </div>
