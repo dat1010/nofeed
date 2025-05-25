@@ -3,11 +3,19 @@ import React from 'react';
 const ScheduledEventButton: React.FC = () => {
   const handleCreateScheduledEvent = async () => {
     try {
+      // Get the token from localStorage
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert('Please log in to create scheduled events');
+        return;
+      }
+
       const response = await fetch('https://api.nofeed.zone/api/events', {
         method: 'POST',
         headers: {
           'accept': 'application/json',
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           description: "A scheduled event that runs daily",
@@ -20,7 +28,8 @@ const ScheduledEventButton: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create scheduled event');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create scheduled event');
       }
 
       const data = await response.json();
@@ -28,7 +37,7 @@ const ScheduledEventButton: React.FC = () => {
       alert('Scheduled event created successfully!');
     } catch (error) {
       console.error('Error creating scheduled event:', error);
-      alert('Failed to create scheduled event');
+      alert(error instanceof Error ? error.message : 'Failed to create scheduled event');
     }
   };
 
