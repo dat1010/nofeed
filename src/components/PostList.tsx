@@ -89,13 +89,6 @@ const PostList: React.FC = () => {
     <div className="feed">
       {posts.map((post) => (
         <article key={post.id} className="media">
-          <figure className="media-left">
-            <p className="image is-48x48">
-              <span className="has-text-grey-light">
-                <i className="fas fa-user-circle fa-2x"></i>
-              </span>
-            </p>
-          </figure>
           <div className="media-content">
             <div className="content">
               <p>
@@ -107,25 +100,6 @@ const PostList: React.FC = () => {
                 <span className="has-text-weight-normal">{post.body}</span>
               </p>
             </div>
-            <nav className="level is-mobile">
-              <div className="level-left">
-                <button className="level-item button is-ghost">
-                  <span className="icon is-small">
-                    <i className="far fa-heart"></i>
-                  </span>
-                </button>
-                <button className="level-item button is-ghost">
-                  <span className="icon is-small">
-                    <i className="far fa-comment"></i>
-                  </span>
-                </button>
-                <button className="level-item button is-ghost">
-                  <span className="icon is-small">
-                    <i className="far fa-share-square"></i>
-                  </span>
-                </button>
-              </div>
-            </nav>
           </div>
         </article>
       ))}

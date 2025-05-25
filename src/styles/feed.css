@@ -4,7 +4,7 @@
 }
 
 .feed .media {
-  padding: 1rem;
+  padding: 1.5rem 1rem;
   border-bottom: 1px solid #eee;
   transition: background-color 0.2s;
 }
@@ -18,7 +18,7 @@
 }
 
 .feed .media-content {
-  margin-left: 0.75rem;
+  margin-left: 0;
 }
 
 .feed .level-item.button {
@@ -40,6 +40,11 @@
 
 .feed .content p {
   margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.feed .content p br {
+  margin-bottom: 0.75rem;
 }
 
 .feed .has-text-grey-light {
@@ -48,4 +53,10 @@
 
 .feed .has-text-weight-semibold {
   font-weight: 600 !important;
+}
+
+.feed .has-text-weight-normal {
+  color: #14171a;
+  font-size: 1.1rem;
+  line-height: 1.5;
 }
