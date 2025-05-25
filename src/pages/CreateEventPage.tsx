@@ -227,14 +227,16 @@ const CreateEventPage: React.FC = () => {
                         <div className="control">
                           <input
                             className="input"
-                            type="time"
+                            type="text"
                             name="scheduleTime"
                             value={formData.scheduleTime}
                             onChange={handleInputChange}
+                            placeholder="HH:MM"
+                            pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
                             required
                           />
                         </div>
-                        <p className="help">Select the time when the event should run (local time)</p>
+                        <p className="help">Enter time in 24-hour format (e.g., 14:30 for 2:30 PM)</p>
                       </div>
                     )}
                     
