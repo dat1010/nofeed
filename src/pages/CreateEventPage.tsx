@@ -44,6 +44,60 @@ const CreateEventPage: React.FC = () => {
     return date.getUTCHours();
   };
 
+  // Convert UTC time to local time for display
+  const convertToLocal = (utcHour: number): string => {
+    const date = new Date();
+    date.setUTCHours(utcHour, 0, 0, 0);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Parse cron expression and get next occurrences
+  const getNextOccurrences = (cronExpression: string): string[] => {
+    const [minute, hour, day, month, dayOfWeek] = cronExpression.split(' ');
+    const occurrences: string[] = [];
+    const now = new Date();
+    
+    // Function to check if a date matches the cron pattern
+    const matchesCronPattern = (date: Date): boolean => {
+      const utcHour = date.getUTCHours();
+      const utcMinute = date.getUTCMinutes();
+      const utcDay = date.getUTCDate();
+      const utcMonth = date.getUTCMonth() + 1; // JavaScript months are 0-based
+      const utcDayOfWeek = date.getUTCDay();
+
+      // Check hour and minute
+      if (hour !== '*' && parseInt(hour) !== utcHour) return false;
+      if (minute !== '*' && parseInt(minute) !== utcMinute) return false;
+
+      // Check day of month
+      if (day !== '*' && day !== '?' && parseInt(day) !== utcDay) return false;
+
+      // Check month
+      if (month !== '*' && parseInt(month) !== utcMonth) return false;
+
+      // Check day of week
+      if (dayOfWeek !== '*' && dayOfWeek !== '?') {
+        const cronDay = dayOfWeek === 'FRI' ? 5 : parseInt(dayOfWeek);
+        if (cronDay !== utcDayOfWeek) return false;
+      }
+
+      return true;
+    };
+
+    // Find next 3 occurrences
+    let currentDate = new Date(now);
+    while (occurrences.length < 3) {
+      if (matchesCronPattern(currentDate)) {
+        const localTime = new Date(currentDate).toLocaleString();
+        occurrences.push(localTime);
+      }
+      // Move to next minute
+      currentDate.setMinutes(currentDate.getMinutes() + 1);
+    }
+
+    return occurrences;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
@@ -66,17 +120,6 @@ const CreateEventPage: React.FC = () => {
       
       return newData;
     });
-  };
-
-  // Function to get next occurrences (mock implementation - replace with actual API call)
-  const getNextOccurrences = (cronExpression: string) => {
-    // This is a placeholder - you should implement actual cron parsing
-    const now = new Date();
-    return [
-      new Date(now.getTime() + 24 * 60 * 60 * 1000).toLocaleString(),
-      new Date(now.getTime() + 48 * 60 * 60 * 1000).toLocaleString(),
-      new Date(now.getTime() + 72 * 60 * 60 * 1000).toLocaleString()
-    ];
   };
 
   useEffect(() => {
@@ -222,7 +265,7 @@ const CreateEventPage: React.FC = () => {
                 </div>
 
                 <div className="field">
-                  <label className="label">Next Occurrences</label>
+                  <label className="label">Next Occurrences (Local Time)</label>
                   <div className="box">
                     <ul>
                       {nextOccurrences.map((date, index) => (
