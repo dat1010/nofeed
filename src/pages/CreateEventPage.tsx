@@ -44,13 +44,6 @@ const CreateEventPage: React.FC = () => {
     return date.getUTCHours();
   };
 
-  // Convert UTC time to local time for display
-  const convertToLocal = (utcHour: number): string => {
-    const date = new Date();
-    date.setUTCHours(utcHour, 0, 0, 0);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
   // Parse cron expression and get next occurrences
   const getNextOccurrences = (cronExpression: string): string[] => {
     const [minute, hour, day, month, dayOfWeek] = cronExpression.split(' ');
