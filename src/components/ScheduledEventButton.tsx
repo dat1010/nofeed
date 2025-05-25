@@ -1,24 +1,20 @@
 import React from 'react';
 import api from "../services/api";
+import { getCookie } from "../utils/cookies";
 
 const ScheduledEventButton: React.FC = () => {
   const handleCreateScheduledEvent = async () => {
     try {
-      // Get the token from localStorage first, then fall back to Authorization header
-      const token = localStorage.getItem("token") ||
-        (api.defaults.headers.common["Authorization"] as string)?.split(" ")[1];
-      
-      console.log('Token:', token);
+      // Get the token from cookies
+      const token = getCookie("id_token");
+      console.log('Token from cookie:', token);
 
       if (!token) {
         alert('Please log in to create scheduled events');
         return;
       }
 
-      // Set the Authorization header
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      // Use the api instance
+      // Use the api instance with the token
       const response = await api.post('/events', {
         description: "A scheduled event that runs daily",
         name: "my-scheduled-event",
@@ -26,6 +22,10 @@ const ScheduledEventButton: React.FC = () => {
           "{\"key\"": "\"value\"}"
         },
         schedule: "0 12 * * ? *"
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
       console.log('Scheduled event created:', response.data);
