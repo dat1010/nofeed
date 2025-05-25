@@ -4,41 +4,33 @@ import api from "../services/api";
 const ScheduledEventButton: React.FC = () => {
   const handleCreateScheduledEvent = async () => {
     try {
+      // Debug logging
+      console.log('Auth header:', api.defaults.headers.common["Authorization"]);
+      
       // Get the token from the Authorization header
       const token = (api.defaults.headers.common["Authorization"] as string)?.split(" ")[1];
+      console.log('Extracted token:', token);
+
       if (!token) {
         alert('Please log in to create scheduled events');
         return;
       }
 
-      const response = await fetch('https://api.nofeed.zone/api/events', {
-        method: 'POST',
-        headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+      // Use the api instance directly instead of fetch
+      const response = await api.post('/events', {
+        description: "A scheduled event that runs daily",
+        name: "my-scheduled-event",
+        payload: {
+          "{\"key\"": "\"value\"}"
         },
-        body: JSON.stringify({
-          description: "A scheduled event that runs daily",
-          name: "my-scheduled-event",
-          payload: {
-            "{\"key\"": "\"value\"}"
-          },
-          schedule: "0 12 * * ? *"
-        })
+        schedule: "0 12 * * ? *"
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create scheduled event');
-      }
-
-      const data = await response.json();
-      console.log('Scheduled event created:', data);
+      console.log('Scheduled event created:', response.data);
       alert('Scheduled event created successfully!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating scheduled event:', error);
-      alert(error instanceof Error ? error.message : 'Failed to create scheduled event');
+      alert(error.response?.data?.error || error.message || 'Failed to create scheduled event');
     }
   };
 
