@@ -21,13 +21,17 @@
   margin-left: 0.75rem;
 }
 
-.feed .level-item {
+.feed .level-item.button {
+  padding: 0.25rem;
+  background: none;
+  border: none;
   color: #657786;
   transition: color 0.2s;
 }
 
-.feed .level-item:hover {
+.feed .level-item.button:hover {
   color: #1da1f2;
+  background: none;
 }
 
 .feed .icon {
@@ -44,4 +48,4 @@
 
 .feed .has-text-weight-semibold {
   font-weight: 600 !important;
-} 
+}

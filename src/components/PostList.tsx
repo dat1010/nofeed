@@ -109,21 +109,21 @@ const PostList: React.FC = () => {
             </div>
             <nav className="level is-mobile">
               <div className="level-left">
-                <a className="level-item">
+                <button className="level-item button is-ghost">
                   <span className="icon is-small">
                     <i className="far fa-heart"></i>
                   </span>
-                </a>
-                <a className="level-item">
+                </button>
+                <button className="level-item button is-ghost">
                   <span className="icon is-small">
                     <i className="far fa-comment"></i>
                   </span>
-                </a>
-                <a className="level-item">
+                </button>
+                <button className="level-item button is-ghost">
                   <span className="icon is-small">
                     <i className="far fa-share-square"></i>
                   </span>
-                </a>
+                </button>
               </div>
             </nav>
           </div>
