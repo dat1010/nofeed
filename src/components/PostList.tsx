@@ -1,76 +1,75 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
+import jwtDecode from "jwt-decode";
 
 interface Post {
   id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
+  title: string;
+  body: string;
+  author: string;
 }
 
-const PostList: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface JwtPayload {
+  sub: string;
+}
 
-  const fetchPosts = async () => {
-    try {
-      const response = await api.get("/posts?published=true");
-      // Ensure we have a valid array of posts
-      const postsData = response.data || [];
-      setPosts(Array.isArray(postsData) ? postsData : []);
-      setError(null);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-      setError("Failed to load posts");
-      setPosts([]); // Ensure posts is an empty array on error
-    } finally {
-      setIsLoading(false);
-    }
-  };
+const fetchPosts = async (
+  setPosts: React.Dispatch<React.SetStateAction<Post[]>>,
+  setError: React.Dispatch<React.SetStateAction<string | null>>,
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+  setIsLoading(true);
+
+  try {
+    // 1. Get the raw token
+    const raw = localStorage.getItem("token") ||
+      api.defaults.headers.common["Authorization"]?.split(" ")[1];
+
+    // 2. Decode it
+    const { sub: auth0UserId } = raw
+      ? (jwtDecode<JwtPayload>(raw))
+      : { sub: null };
+
+    // 3. Build params
+    const params: Record<string, string> = {};
+    if (auth0UserId) params.author = auth0UserId;
+
+    // 4. Fetch with ?author=<userId>
+    const response = await api.get<Post[]>("/posts", { params });
+    const postsData = response.data || [];
+
+    setPosts(Array.isArray(postsData) ? postsData : []);
+    setError(null);
+  } catch (err: any) {
+    console.error("Error fetching posts:", err);
+    setError("Failed to load posts");
+    setPosts([]);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+export default function PostList() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(setPosts, setError, setIsLoading);
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="has-text-centered">
-        <div className="button is-loading is-large"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="notification is-danger">
-        {error}
-      </div>
-    );
-  }
-
-  // Ensure posts is always an array before mapping
-  const validPosts = Array.isArray(posts) ? posts : [];
+  if (isLoading) return <div>Loading…</div>;
+  if (error) return <div style={{ color: "red" }}>{error}</div>;
 
   return (
-    <div className="posts">
-      {validPosts.map((post) => (
-        <div key={post.id} className="box">
-          <div className="content">
-            <p>{post.content}</p>
-            <small className="has-text-grey">
-              Posted on {new Date(post.created_at).toLocaleString()}
-            </small>
-          </div>
-        </div>
+    <ul>
+      {posts.map((p) => (
+        <li key={p.id}>
+          <strong>{p.title}</strong> (by {p.author})
+        </li>
       ))}
-      {validPosts.length === 0 && (
-        <div className="has-text-centered has-text-grey">
-          No posts yet. Be the first to post something!
-        </div>
-      )}
-    </div>
+    </ul>
   );
-};
+}
 
 export default PostList; 
