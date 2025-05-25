@@ -11,13 +11,13 @@ interface EventFormData {
   payload: string;
   scheduleType: 'preset' | 'custom';
   presetSchedule: string;
+  scheduleTime: string;
 }
 
 const PRESET_SCHEDULES = {
-  'daily-noon': { label: 'Daily at Noon', value: '0 12 * * ? *' },
-  'daily-midnight': { label: 'Daily at Midnight', value: '0 0 * * ? *' },
-  'weekly-monday': { label: 'Weekly on Monday', value: '0 12 ? * MON *' },
-  'monthly-first': { label: 'Monthly on 1st', value: '0 12 1 * ? *' },
+  'daily': { label: 'Daily', value: '0 {hour} * * ? *' },
+  'weekly-monday': { label: 'Weekly on Monday', value: '0 {hour} ? * MON *' },
+  'monthly-first': { label: 'Monthly on 1st', value: '0 {hour} 1 * ? *' },
   'custom': { label: 'Custom Schedule', value: '' }
 };
 
@@ -32,7 +32,8 @@ const CreateEventPage: React.FC = () => {
     schedule: '0 12 * * ? *',
     payload: '{"key": "value"}',
     scheduleType: 'preset',
-    presetSchedule: 'daily-noon'
+    presetSchedule: 'daily',
+    scheduleTime: '12:00'
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -43,10 +44,16 @@ const CreateEventPage: React.FC = () => {
         [name]: value
       };
       
-      // If changing preset schedule, update the actual schedule
-      if (name === 'presetSchedule') {
-        newData.schedule = PRESET_SCHEDULES[value as keyof typeof PRESET_SCHEDULES].value;
-        newData.scheduleType = value === 'custom' ? 'custom' : 'preset';
+      // If changing preset schedule or time, update the actual schedule
+      if (name === 'presetSchedule' || name === 'scheduleTime') {
+        if (newData.scheduleType === 'preset') {
+          const [hours] = newData.scheduleTime.split(':');
+          const scheduleTemplate = PRESET_SCHEDULES[newData.presetSchedule as keyof typeof PRESET_SCHEDULES].value;
+          newData.schedule = scheduleTemplate.replace('{hour}', hours);
+        }
+        if (name === 'presetSchedule') {
+          newData.scheduleType = value === 'custom' ? 'custom' : 'preset';
+        }
       }
       
       return newData;
@@ -171,6 +178,22 @@ const CreateEventPage: React.FC = () => {
                       </select>
                     </div>
                     
+                    {formData.scheduleType === 'preset' && (
+                      <div className="field">
+                        <div className="control">
+                          <input
+                            className="input"
+                            type="time"
+                            name="scheduleTime"
+                            value={formData.scheduleTime}
+                            onChange={handleInputChange}
+                            required
+                          />
+                        </div>
+                        <p className="help">Select the time when the event should run</p>
+                      </div>
+                    )}
+                    
                     {formData.scheduleType === 'custom' && (
                       <input
                         className="input"
@@ -186,7 +209,7 @@ const CreateEventPage: React.FC = () => {
                   <p className="help">
                     {formData.scheduleType === 'custom' 
                       ? 'Format: minute hour day month day-of-week year'
-                      : 'Select a preset schedule or choose custom for more options'}
+                      : 'Select a preset schedule and time, or choose custom for more options'}
                   </p>
                 </div>
 
