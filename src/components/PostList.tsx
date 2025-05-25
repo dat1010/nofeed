@@ -101,7 +101,7 @@ const PostList: React.FC = () => {
             <p className="has-text-grey-light is-size-7 mb-2">
               {post.created_at && new Date(post.created_at).toLocaleDateString()}
             </p>
-            <p className="title is-5 mb-1">{post.content}</p>
+            <p className="is-5 has-text-weight-normal mb-1">{post.content}</p>
           </div>
         </div>
       ))}
