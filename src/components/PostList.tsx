@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 interface Post {
   id: string;
@@ -23,11 +23,11 @@ const fetchPosts = async (
   try {
     // 1. Get the raw token
     const raw = localStorage.getItem("token") ||
-      api.defaults.headers.common["Authorization"]?.split(" ")[1];
+      (api.defaults.headers.common["Authorization"] as string)?.split(" ")[1];
 
     // 2. Decode it
     const { sub: auth0UserId } = raw
-      ? (jwtDecode<JwtPayload>(raw))
+      ? jwtDecode<JwtPayload>(raw)
       : { sub: null };
 
     // 3. Build params
@@ -49,7 +49,7 @@ const fetchPosts = async (
   }
 };
 
-export default function PostList() {
+const PostList: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +70,6 @@ export default function PostList() {
       ))}
     </ul>
   );
-}
+};
 
 export default PostList; 
