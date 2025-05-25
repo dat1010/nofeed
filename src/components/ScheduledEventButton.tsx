@@ -4,19 +4,21 @@ import api from "../services/api";
 const ScheduledEventButton: React.FC = () => {
   const handleCreateScheduledEvent = async () => {
     try {
-      // Debug logging
-      console.log('Auth header:', api.defaults.headers.common["Authorization"]);
+      // Get the token from localStorage first, then fall back to Authorization header
+      const token = localStorage.getItem("token") ||
+        (api.defaults.headers.common["Authorization"] as string)?.split(" ")[1];
       
-      // Get the token from the Authorization header
-      const token = (api.defaults.headers.common["Authorization"] as string)?.split(" ")[1];
-      console.log('Extracted token:', token);
+      console.log('Token:', token);
 
       if (!token) {
         alert('Please log in to create scheduled events');
         return;
       }
 
-      // Use the api instance directly instead of fetch
+      // Set the Authorization header
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      // Use the api instance
       const response = await api.post('/events', {
         description: "A scheduled event that runs daily",
         name: "my-scheduled-event",
