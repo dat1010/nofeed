@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import ScheduledEventButton from "./ScheduledEventButton";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +36,9 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="navbar-end">
+            <div className="navbar-item">
+              <ScheduledEventButton />
+            </div>
             <div className="navbar-item">
               <div className="buttons">
                 <button className="button is-light" onClick={handleLogout}>
