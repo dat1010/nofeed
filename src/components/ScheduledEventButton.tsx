@@ -1,10 +1,11 @@
 import React from 'react';
+import api from "../services/api";
 
 const ScheduledEventButton: React.FC = () => {
   const handleCreateScheduledEvent = async () => {
     try {
-      // Get the token from localStorage
-      const token = localStorage.getItem("token");
+      // Get the token from the Authorization header
+      const token = (api.defaults.headers.common["Authorization"] as string)?.split(" ")[1];
       if (!token) {
         alert('Please log in to create scheduled events');
         return;
