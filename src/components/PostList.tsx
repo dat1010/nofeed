@@ -7,6 +7,7 @@ interface Post {
   title: string;
   body: string;
   author: string;
+  created_at?: string;
 }
 
 interface JwtPayload {
@@ -58,17 +59,54 @@ const PostList: React.FC = () => {
     fetchPosts(setPosts, setError, setIsLoading);
   }, []);
 
-  if (isLoading) return <div>Loading…</div>;
-  if (error) return <div style={{ color: "red" }}>{error}</div>;
+  if (isLoading) {
+    return (
+      <div className="has-text-centered py-6">
+        <div className="button is-loading is-large is-white"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="notification is-danger is-light">
+        <button className="delete" onClick={() => setError(null)}></button>
+        {error}
+      </div>
+    );
+  }
+
+  if (posts.length === 0) {
+    return (
+      <div className="notification is-info is-light">
+        No posts yet. Be the first to post something!
+      </div>
+    );
+  }
 
   return (
-    <ul>
-      {posts.map((p) => (
-        <li key={p.id}>
-          <strong>{p.title}</strong> (by {p.author})
-        </li>
+    <div className="columns is-multiline">
+      {posts.map((post) => (
+        <div key={post.id} className="column is-12">
+          <div className="card">
+            <div className="card-content">
+              <div className="content">
+                <h3 className="title is-4">{post.title}</h3>
+                <p className="subtitle is-6 has-text-grey">
+                  Posted by <strong>{post.author}</strong>
+                  {post.created_at && (
+                    <> on {new Date(post.created_at).toLocaleDateString()}</>
+                  )}
+                </p>
+                <div className="content">
+                  {post.body}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       ))}
-    </ul>
+    </div>
   );
 };
 
