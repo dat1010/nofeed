@@ -1,0 +1,47 @@
+.feed {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.feed .media {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.feed .media:hover {
+  background-color: #f8f9fa;
+}
+
+.feed .media:last-child {
+  border-bottom: none;
+}
+
+.feed .media-content {
+  margin-left: 0.75rem;
+}
+
+.feed .level-item {
+  color: #657786;
+  transition: color 0.2s;
+}
+
+.feed .level-item:hover {
+  color: #1da1f2;
+}
+
+.feed .icon {
+  margin-right: 1rem;
+}
+
+.feed .content p {
+  margin-bottom: 0.5rem;
+}
+
+.feed .has-text-grey-light {
+  color: #657786 !important;
+}
+
+.feed .has-text-weight-semibold {
+  font-weight: 600 !important;
+} 

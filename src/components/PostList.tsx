@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { jwtDecode } from "jwt-decode";
+import "../styles/feed.css";
 
 interface Post {
   id: string;
@@ -85,26 +86,48 @@ const PostList: React.FC = () => {
   }
 
   return (
-    <div className="columns is-multiline">
+    <div className="feed">
       {posts.map((post) => (
-        <div key={post.id} className="column is-12">
-          <div className="card">
-            <div className="card-content">
-              <div className="content">
-                <h3 className="title is-4">{post.title}</h3>
-                <p className="subtitle is-6 has-text-grey">
-                  Posted by <strong>{post.author}</strong>
-                  {post.created_at && (
-                    <> on {new Date(post.created_at).toLocaleDateString()}</>
-                  )}
-                </p>
-                <div className="content">
-                  {post.body}
-                </div>
-              </div>
+        <article key={post.id} className="media">
+          <figure className="media-left">
+            <p className="image is-48x48">
+              <span className="has-text-grey-light">
+                <i className="fas fa-user-circle fa-2x"></i>
+              </span>
+            </p>
+          </figure>
+          <div className="media-content">
+            <div className="content">
+              <p>
+                <strong className="has-text-weight-semibold">{post.author}</strong>
+                <span className="has-text-grey-light is-size-7 ml-2">
+                  {post.created_at && new Date(post.created_at).toLocaleDateString()}
+                </span>
+                <br />
+                <span className="has-text-weight-normal">{post.body}</span>
+              </p>
             </div>
+            <nav className="level is-mobile">
+              <div className="level-left">
+                <a className="level-item">
+                  <span className="icon is-small">
+                    <i className="far fa-heart"></i>
+                  </span>
+                </a>
+                <a className="level-item">
+                  <span className="icon is-small">
+                    <i className="far fa-comment"></i>
+                  </span>
+                </a>
+                <a className="level-item">
+                  <span className="icon is-small">
+                    <i className="far fa-share-square"></i>
+                  </span>
+                </a>
+              </div>
+            </nav>
           </div>
-        </div>
+        </article>
       ))}
     </div>
   );
