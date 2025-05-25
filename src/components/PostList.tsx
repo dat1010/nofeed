@@ -85,6 +85,9 @@ const PostList: React.FC = () => {
     );
   }
 
+  // Debug: log posts to console
+  console.log('Posts:', posts);
+
   return (
     <div className="feed">
       {posts.map((post) => (
