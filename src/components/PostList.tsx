@@ -94,17 +94,23 @@ const PostList: React.FC = () => {
   console.log('Posts:', posts);
 
   return (
-    <div className="feed">
-      {posts.map((post) => (
-        <div key={post.id} className="card mb-5">
-          <div className="card-content">
-            <p className="has-text-grey-light is-size-7 mb-2">
-              {post.created_at && new Date(post.created_at).toLocaleDateString()}
-            </p>
-            <p className="is-5 has-text-weight-normal mb-1">{post.content}</p>
+    <div className="container mt-5">
+      <div className="columns is-centered">
+        <div className="column is-half">
+          <div className="feed">
+            {posts.map((post) => (
+              <div key={post.id} className="card mb-5">
+                <div className="card-content">
+                  <p className="has-text-grey-light is-size-7 mb-2">
+                    {post.created_at && new Date(post.created_at).toLocaleDateString()}
+                  </p>
+                  <p className="is-5 has-text-weight-normal mb-1">{post.content}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
+      </div>
     </div>
   );
 };
