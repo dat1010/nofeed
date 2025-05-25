@@ -113,6 +113,14 @@ const CreateEventPage: React.FC = () => {
       
       return newData;
     });
+
+    // Update next occurrences immediately after form data changes
+    if (name === 'scheduleTime' || name === 'presetSchedule') {
+      const updatedSchedule = name === 'scheduleTime' 
+        ? PRESET_SCHEDULES[formData.presetSchedule as keyof typeof PRESET_SCHEDULES].value.replace('{hour}', convertToUTC(value).toString())
+        : formData.schedule;
+      setNextOccurrences(getNextOccurrences(updatedSchedule));
+    }
   };
 
   useEffect(() => {
