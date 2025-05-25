@@ -16,7 +16,7 @@ interface EventFormData {
 
 const PRESET_SCHEDULES = {
   'daily': { label: 'Daily', value: '0 {hour} * * ? *' },
-  'weekly-monday': { label: 'Weekly on Monday', value: '0 {hour} ? * MON *' },
+  'weekly-friday': { label: 'Weekly on Friday', value: '0 {hour} ? * FRI *' },
   'monthly-first': { label: 'Monthly on 1st', value: '0 {hour} 1 * ? *' },
   'custom': { label: 'Custom Schedule', value: '' }
 };
