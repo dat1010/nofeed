@@ -6,9 +6,14 @@ import "../styles/feed.css";
 interface Post {
   id: string;
   title: string;
-  body: string;
-  author: string;
+  content: string;
+  body?: string;
+  author?: string;
+  auth0_user_id?: string;
   created_at?: string;
+  published?: boolean;
+  slug?: string;
+  updated_at?: string;
 }
 
 interface JwtPayload {
@@ -100,7 +105,7 @@ const PostList: React.FC = () => {
                   {post.created_at && new Date(post.created_at).toLocaleDateString()}
                 </span>
                 <br />
-                <span className="has-text-weight-normal">{post.body}</span>
+                <span className="has-text-weight-normal">{post.content}</span>
               </p>
             </div>
           </div>
