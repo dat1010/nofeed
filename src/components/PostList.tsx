@@ -96,20 +96,14 @@ const PostList: React.FC = () => {
   return (
     <div className="feed">
       {posts.map((post) => (
-        <article key={post.id} className="media">
-          <div className="media-content">
-            <div className="content">
-              <p>
-                <strong className="has-text-weight-semibold">{post.author}</strong>
-                <span className="has-text-grey-light is-size-7 ml-2">
-                  {post.created_at && new Date(post.created_at).toLocaleDateString()}
-                </span>
-                <br />
-                <span className="has-text-weight-normal">{post.content}</span>
-              </p>
-            </div>
+        <div key={post.id} className="card mb-5">
+          <div className="card-content">
+            <p className="has-text-grey-light is-size-7 mb-2">
+              {post.created_at && new Date(post.created_at).toLocaleDateString()}
+            </p>
+            <p className="title is-5 mb-1">{post.content}</p>
           </div>
-        </article>
+        </div>
       ))}
     </div>
   );
