@@ -26,6 +26,7 @@ const CreateEventPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nextOccurrences, setNextOccurrences] = useState<string[]>([]);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
   const [formData, setFormData] = useState<EventFormData>({
     name: '',
     description: '',
@@ -213,6 +214,7 @@ const CreateEventPage: React.FC = () => {
         const occurrences = getNextOccurrences(schedule);
         console.log('Calculated occurrences:', occurrences);
         setNextOccurrences(occurrences);
+        setUpdateTrigger(prev => prev + 1);
       } catch (error) {
         console.error('Error calculating next occurrences:', error);
         setNextOccurrences(['Error calculating schedule']);
@@ -375,11 +377,15 @@ const CreateEventPage: React.FC = () => {
                 <div className="field">
                   <label className="label">Next Occurrences (Local Time)</label>
                   <div className="box">
-                    <ul>
-                      {nextOccurrences.map((date, index) => (
-                        <li key={index}>{date}</li>
-                      ))}
-                    </ul>
+                    {nextOccurrences.length > 0 ? (
+                      <ul>
+                        {nextOccurrences.map((date, index) => (
+                          <li key={`${date}-${index}`}>{date}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No upcoming occurrences found</p>
+                    )}
                   </div>
                 </div>
 
