@@ -383,6 +383,8 @@ const CreateEventPage: React.FC = () => {
                           <li key={`${date}-${index}`}>{date}</li>
                         ))}
                       </ul>
+                    ) : (
+                      <p>No upcoming occurrences found</p>
                     )}
                   </div>
                 </div>
