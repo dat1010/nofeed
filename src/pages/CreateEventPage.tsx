@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { getCookie } from '../utils/cookies';
@@ -193,24 +193,15 @@ const CreateEventPage: React.FC = () => {
       
       return newData;
     });
-
-    // Update next occurrences immediately after form data changes
-    if (name === 'scheduleTime' || name === 'presetSchedule' || name === 'schedule') {
-      const updatedSchedule = formData.scheduleType === 'preset' && name === 'scheduleTime'
-        ? (() => {
-            const utcTime = convertToUTC(value);
-            if (utcTime) {
-              return PRESET_SCHEDULES[formData.presetSchedule as keyof typeof PRESET_SCHEDULES].value
-                .replace('{hour}', utcTime.hours.toString())
-                .replace('{minute}', utcTime.minutes.toString());
-            }
-            return formData.schedule;
-          })()
-        : name === 'schedule' ? value : formData.schedule;
-      
-      setNextOccurrences(getNextOccurrences(updatedSchedule));
-    }
   };
+
+  // Update next occurrences whenever schedule changes
+  useEffect(() => {
+    console.log('Schedule changed:', formData.schedule);
+    const occurrences = getNextOccurrences(formData.schedule);
+    console.log('Next occurrences:', occurrences);
+    setNextOccurrences(occurrences);
+  }, [formData.schedule]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
