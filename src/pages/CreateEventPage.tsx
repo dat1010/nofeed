@@ -26,7 +26,7 @@ const CreateEventPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nextOccurrences, setNextOccurrences] = useState<string[]>([]);
-  const [setUpdateTrigger] = useState(0);
+  const [updateTrigger, setUpdateTrigger] = useState<number>(0);
   const [formData, setFormData] = useState<EventFormData>({
     name: '',
     description: '',
@@ -213,8 +213,8 @@ const CreateEventPage: React.FC = () => {
         console.log('Calculating next occurrences for schedule:', schedule);
         const occurrences = getNextOccurrences(schedule);
         console.log('Calculated occurrences:', occurrences);
-        setNextOccurrences(occurrences);
-        setUpdateTrigger(prev => prev + 1);
+        // Force a new array reference to ensure React detects the change
+        setNextOccurrences([...occurrences]);
       } catch (error) {
         console.error('Error calculating next occurrences:', error);
         setNextOccurrences(['Error calculating schedule']);
@@ -383,44 +383,18 @@ const CreateEventPage: React.FC = () => {
                           <li key={`${date}-${index}`}>{date}</li>
                         ))}
                       </ul>
-                    ) : (
-                      <p>No upcoming occurrences found</p>
                     )}
                   </div>
-                </div>
-
-                <div className="field">
-                  <label className="label">Payload (JSON)</label>
-                  <div className="control">
-                    <textarea
-                      className="textarea"
-                      name="payload"
-                      value={formData.payload}
-                      onChange={handleInputChange}
-                      placeholder='{"key": "value"}'
-                      required
-                    />
-                  </div>
-                  <p className="help">JSON data to be passed to the event handler</p>
                 </div>
 
                 <div className="field is-grouped">
                   <div className="control">
                     <button
-                      className={`button is-primary ${isSubmitting ? 'is-loading' : ''}`}
                       type="submit"
+                      className="button is-link"
                       disabled={isSubmitting}
                     >
-                      Create Event
-                    </button>
-                  </div>
-                  <div className="control">
-                    <button
-                      className="button is-light"
-                      type="button"
-                      onClick={() => navigate('/home')}
-                    >
-                      Cancel
+                      {isSubmitting ? 'Creating...' : 'Create Event'}
                     </button>
                   </div>
                 </div>
@@ -433,4 +407,4 @@ const CreateEventPage: React.FC = () => {
   );
 };
 
-export default CreateEventPage; 
+export default CreateEventPage;
