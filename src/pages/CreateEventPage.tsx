@@ -54,12 +54,14 @@ const CreateEventPage: React.FC = () => {
   // Parse cron expression and get next occurrences
   const getNextOccurrences = (cronExpression: string): string[] => {
     if (!cronExpression) return ['Invalid schedule'];
-    
     try {
-      const [minute, hour, day, month, dayOfWeek] = cronExpression.split(' ');
+      const fields = cronExpression.split(' ');
+      if (fields.length < 5) return ['Invalid schedule'];
+      // Support both 5 and 6 field crons (ignore year if present)
+      const [minute, hour, day, month, dayOfWeek] = fields;
       const occurrences: string[] = [];
       const now = new Date();
-      
+
       // Function to format date with timezone
       const formatDate = (date: Date): string => {
         return date.toLocaleString(undefined, {
@@ -73,59 +75,43 @@ const CreateEventPage: React.FC = () => {
         });
       };
 
+      // Helper to check if a field matches a value
+      const matchesField = (field: string, value: number, cronType: 'minute' | 'hour' | 'day' | 'month' | 'dow') => {
+        if (field === '*' || field === '?') return true;
+        if (cronType === 'dow' && isNaN(Number(field))) {
+          // Handle day of week as string (e.g., FRI)
+          const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+          return days[value] === field.toUpperCase();
+        }
+        return Number(field) === value;
+      };
+
       // Function to get next occurrence from a given date
       const getNextOccurrence = (startDate: Date): Date | null => {
         let currentDate = new Date(startDate);
         let attempts = 0;
-        const maxAttempts = 1000;
+        const maxAttempts = 10000; // Increase attempts for robustness
 
         while (attempts < maxAttempts) {
-          const utcHour = currentDate.getUTCHours();
           const utcMinute = currentDate.getUTCMinutes();
+          const utcHour = currentDate.getUTCHours();
           const utcDay = currentDate.getUTCDate();
           const utcMonth = currentDate.getUTCMonth() + 1;
           const utcDayOfWeek = currentDate.getUTCDay();
 
-          // Check if current date matches the schedule
-          let matches = true;
-
-          // Check hour and minute
-          if (hour !== '*' && parseInt(hour) !== utcHour) matches = false;
-          if (minute !== '*' && parseInt(minute) !== utcMinute) matches = false;
-
-          // Check day of month
-          if (day !== '*' && day !== '?') {
-            const dayNum = parseInt(day);
-            if (dayNum !== utcDay) matches = false;
-          }
-
-          // Check month
-          if (month !== '*' && parseInt(month) !== utcMonth) matches = false;
-
-          // Check day of week
-          if (dayOfWeek !== '*' && dayOfWeek !== '?') {
-            let cronDay: number;
-            if (dayOfWeek === 'FRI') {
-              cronDay = 5;
-            } else {
-              cronDay = parseInt(dayOfWeek);
-            }
-            if (cronDay !== utcDayOfWeek) matches = false;
-          }
+          let matches =
+            matchesField(minute, utcMinute, 'minute') &&
+            matchesField(hour, utcHour, 'hour') &&
+            matchesField(day, utcDay, 'day') &&
+            matchesField(month, utcMonth, 'month') &&
+            matchesField(dayOfWeek, utcDayOfWeek, 'dow');
 
           if (matches) {
             return currentDate;
           }
 
-          // Increment date based on schedule type
-          if (dayOfWeek !== '*' || day !== '*') {
-            // For weekly/monthly schedules, increment by days
-            currentDate.setDate(currentDate.getDate() + 1);
-          } else {
-            // For daily schedules, increment by minutes
-            currentDate.setMinutes(currentDate.getMinutes() + 1);
-          }
-
+          // Increment by 1 minute for next check
+          currentDate.setUTCMinutes(currentDate.getUTCMinutes() + 1);
           attempts++;
         }
         return null;
