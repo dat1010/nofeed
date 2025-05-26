@@ -37,8 +37,12 @@ const CreateEventPage: React.FC = () => {
   });
 
   // Convert local time to UTC
-  const convertToUTC = (localTime: string): { hours: number; minutes: number } => {
+  const convertToUTC = (localTime: string): { hours: number; minutes: number } | null => {
+    if (!localTime || !localTime.includes(':')) return null;
+    
     const [hours, minutes] = localTime.split(':').map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return null;
+    
     const date = new Date();
     date.setHours(hours, minutes, 0, 0);
     return {
@@ -49,49 +53,60 @@ const CreateEventPage: React.FC = () => {
 
   // Parse cron expression and get next occurrences
   const getNextOccurrences = (cronExpression: string): string[] => {
-    const [minute, hour, day, month, dayOfWeek] = cronExpression.split(' ');
-    const occurrences: string[] = [];
-    const now = new Date();
+    if (!cronExpression) return ['Invalid schedule'];
     
-    // Function to check if a date matches the cron pattern
-    const matchesCronPattern = (date: Date): boolean => {
-      const utcHour = date.getUTCHours();
-      const utcMinute = date.getUTCMinutes();
-      const utcDay = date.getUTCDate();
-      const utcMonth = date.getUTCMonth() + 1; // JavaScript months are 0-based
-      const utcDayOfWeek = date.getUTCDay();
+    try {
+      const [minute, hour, day, month, dayOfWeek] = cronExpression.split(' ');
+      const occurrences: string[] = [];
+      const now = new Date();
+      
+      // Function to check if a date matches the cron pattern
+      const matchesCronPattern = (date: Date): boolean => {
+        const utcHour = date.getUTCHours();
+        const utcMinute = date.getUTCMinutes();
+        const utcDay = date.getUTCDate();
+        const utcMonth = date.getUTCMonth() + 1; // JavaScript months are 0-based
+        const utcDayOfWeek = date.getUTCDay();
 
-      // Check hour and minute
-      if (hour !== '*' && parseInt(hour) !== utcHour) return false;
-      if (minute !== '*' && parseInt(minute) !== utcMinute) return false;
+        // Check hour and minute
+        if (hour !== '*' && parseInt(hour) !== utcHour) return false;
+        if (minute !== '*' && parseInt(minute) !== utcMinute) return false;
 
-      // Check day of month
-      if (day !== '*' && day !== '?' && parseInt(day) !== utcDay) return false;
+        // Check day of month
+        if (day !== '*' && day !== '?' && parseInt(day) !== utcDay) return false;
 
-      // Check month
-      if (month !== '*' && parseInt(month) !== utcMonth) return false;
+        // Check month
+        if (month !== '*' && parseInt(month) !== utcMonth) return false;
 
-      // Check day of week
-      if (dayOfWeek !== '*' && dayOfWeek !== '?') {
-        const cronDay = dayOfWeek === 'FRI' ? 5 : parseInt(dayOfWeek);
-        if (cronDay !== utcDayOfWeek) return false;
+        // Check day of week
+        if (dayOfWeek !== '*' && dayOfWeek !== '?') {
+          const cronDay = dayOfWeek === 'FRI' ? 5 : parseInt(dayOfWeek);
+          if (cronDay !== utcDayOfWeek) return false;
+        }
+
+        return true;
+      };
+
+      // Find next 3 occurrences
+      let currentDate = new Date(now);
+      let attempts = 0;
+      const maxAttempts = 1000; // Prevent infinite loops
+
+      while (occurrences.length < 3 && attempts < maxAttempts) {
+        if (matchesCronPattern(currentDate)) {
+          const localTime = new Date(currentDate).toLocaleString();
+          occurrences.push(localTime);
+        }
+        // Move to next minute
+        currentDate.setMinutes(currentDate.getMinutes() + 1);
+        attempts++;
       }
 
-      return true;
-    };
-
-    // Find next 3 occurrences
-    let currentDate = new Date(now);
-    while (occurrences.length < 3) {
-      if (matchesCronPattern(currentDate)) {
-        const localTime = new Date(currentDate).toLocaleString();
-        occurrences.push(localTime);
-      }
-      // Move to next minute
-      currentDate.setMinutes(currentDate.getMinutes() + 1);
+      return occurrences.length > 0 ? occurrences : ['No upcoming occurrences found'];
+    } catch (error) {
+      console.error('Error calculating next occurrences:', error);
+      return ['Error calculating schedule'];
     }
-
-    return occurrences;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -105,14 +120,19 @@ const CreateEventPage: React.FC = () => {
       // If changing preset schedule or time, update the actual schedule
       if (name === 'presetSchedule' || name === 'scheduleTime') {
         if (newData.scheduleType === 'preset') {
-          const { hours, minutes } = convertToUTC(newData.scheduleTime);
-          const scheduleTemplate = PRESET_SCHEDULES[newData.presetSchedule as keyof typeof PRESET_SCHEDULES].value;
-          newData.schedule = scheduleTemplate
-            .replace('{hour}', hours.toString())
-            .replace('{minute}', minutes.toString());
+          const utcTime = convertToUTC(newData.scheduleTime);
+          if (utcTime) {
+            const scheduleTemplate = PRESET_SCHEDULES[newData.presetSchedule as keyof typeof PRESET_SCHEDULES].value;
+            newData.schedule = scheduleTemplate
+              .replace('{hour}', utcTime.hours.toString())
+              .replace('{minute}', utcTime.minutes.toString());
+          }
         }
         if (name === 'presetSchedule') {
           newData.scheduleType = value === 'custom' ? 'custom' : 'preset';
+          if (value === 'custom') {
+            newData.schedule = '0 0 * * ? *'; // Default cron expression for custom
+          }
         }
       }
       
@@ -121,15 +141,17 @@ const CreateEventPage: React.FC = () => {
 
     // Update next occurrences immediately after form data changes
     if (name === 'scheduleTime' || name === 'presetSchedule') {
-      const updatedSchedule = name === 'scheduleTime' 
-        ? (() => {
-            const { hours, minutes } = convertToUTC(value);
-            return PRESET_SCHEDULES[formData.presetSchedule as keyof typeof PRESET_SCHEDULES].value
-              .replace('{hour}', hours.toString())
-              .replace('{minute}', minutes.toString());
-          })()
-        : formData.schedule;
-      setNextOccurrences(getNextOccurrences(updatedSchedule));
+      if (name === 'scheduleTime' && formData.scheduleType === 'preset') {
+        const utcTime = convertToUTC(value);
+        if (utcTime) {
+          const updatedSchedule = PRESET_SCHEDULES[formData.presetSchedule as keyof typeof PRESET_SCHEDULES].value
+            .replace('{hour}', utcTime.hours.toString())
+            .replace('{minute}', utcTime.minutes.toString());
+          setNextOccurrences(getNextOccurrences(updatedSchedule));
+        }
+      } else if (name === 'presetSchedule') {
+        setNextOccurrences(getNextOccurrences(formData.schedule));
+      }
     }
   };
 
