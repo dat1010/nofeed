@@ -151,19 +151,27 @@ const CreateEventPage: React.FC = () => {
       
       // If changing preset schedule or time, update the actual schedule
       if (name === 'presetSchedule' || name === 'scheduleTime') {
-        if (newData.scheduleType === 'preset') {
-          const utcTime = convertToUTC(newData.scheduleTime);
+        if (name === 'presetSchedule') {
+          newData.scheduleType = value === 'custom' ? 'custom' : 'preset';
+          if (value === 'custom') {
+            newData.schedule = '0 0 * * ? *'; // Default cron expression for custom
+          } else {
+            // When changing preset type, use current time to generate new schedule
+            const utcTime = convertToUTC(newData.scheduleTime);
+            if (utcTime) {
+              const scheduleTemplate = PRESET_SCHEDULES[value as keyof typeof PRESET_SCHEDULES].value;
+              newData.schedule = scheduleTemplate
+                .replace('{hour}', utcTime.hours.toString())
+                .replace('{minute}', utcTime.minutes.toString());
+            }
+          }
+        } else if (name === 'scheduleTime' && newData.scheduleType === 'preset') {
+          const utcTime = convertToUTC(value);
           if (utcTime) {
             const scheduleTemplate = PRESET_SCHEDULES[newData.presetSchedule as keyof typeof PRESET_SCHEDULES].value;
             newData.schedule = scheduleTemplate
               .replace('{hour}', utcTime.hours.toString())
               .replace('{minute}', utcTime.minutes.toString());
-          }
-        }
-        if (name === 'presetSchedule') {
-          newData.scheduleType = value === 'custom' ? 'custom' : 'preset';
-          if (value === 'custom') {
-            newData.schedule = '0 0 * * ? *'; // Default cron expression for custom
           }
         }
       }
@@ -173,17 +181,19 @@ const CreateEventPage: React.FC = () => {
 
     // Update next occurrences immediately after form data changes
     if (name === 'scheduleTime' || name === 'presetSchedule') {
-      if (name === 'scheduleTime' && formData.scheduleType === 'preset') {
-        const utcTime = convertToUTC(value);
-        if (utcTime) {
-          const updatedSchedule = PRESET_SCHEDULES[formData.presetSchedule as keyof typeof PRESET_SCHEDULES].value
-            .replace('{hour}', utcTime.hours.toString())
-            .replace('{minute}', utcTime.minutes.toString());
-          setNextOccurrences(getNextOccurrences(updatedSchedule));
-        }
-      } else if (name === 'presetSchedule') {
-        setNextOccurrences(getNextOccurrences(formData.schedule));
-      }
+      const updatedSchedule = formData.scheduleType === 'preset' && name === 'scheduleTime'
+        ? (() => {
+            const utcTime = convertToUTC(value);
+            if (utcTime) {
+              return PRESET_SCHEDULES[formData.presetSchedule as keyof typeof PRESET_SCHEDULES].value
+                .replace('{hour}', utcTime.hours.toString())
+                .replace('{minute}', utcTime.minutes.toString());
+            }
+            return formData.schedule;
+          })()
+        : formData.schedule;
+      
+      setNextOccurrences(getNextOccurrences(updatedSchedule));
     }
   };
 
