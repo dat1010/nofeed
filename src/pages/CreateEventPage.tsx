@@ -73,7 +73,10 @@ const CreateEventPage: React.FC = () => {
         if (minute !== '*' && parseInt(minute) !== utcMinute) return false;
 
         // Check day of month
-        if (day !== '*' && day !== '?' && parseInt(day) !== utcDay) return false;
+        if (day !== '*' && day !== '?') {
+          const dayNum = parseInt(day);
+          if (dayNum !== utcDay) return false;
+        }
 
         // Check month
         if (month !== '*' && parseInt(month) !== utcMonth) return false;
@@ -87,19 +90,48 @@ const CreateEventPage: React.FC = () => {
         return true;
       };
 
-      // Find next 3 occurrences
-      let currentDate = new Date(now);
-      let attempts = 0;
-      const maxAttempts = 1000; // Prevent infinite loops
+      // Function to format date with timezone
+      const formatDate = (date: Date): string => {
+        return date.toLocaleString(undefined, {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          timeZoneName: 'short'
+        });
+      };
 
-      while (occurrences.length < 3 && attempts < maxAttempts) {
-        if (matchesCronPattern(currentDate)) {
-          const localTime = new Date(currentDate).toLocaleString();
-          occurrences.push(localTime);
+      // Function to get next occurrence from a given date
+      const getNextOccurrence = (startDate: Date): Date | null => {
+        let currentDate = new Date(startDate);
+        let attempts = 0;
+        const maxAttempts = 1000; // Prevent infinite loops
+
+        while (attempts < maxAttempts) {
+          if (matchesCronPattern(currentDate)) {
+            return currentDate;
+          }
+          
+          // Move to next minute
+          currentDate.setMinutes(currentDate.getMinutes() + 1);
+          attempts++;
         }
-        // Move to next minute
-        currentDate.setMinutes(currentDate.getMinutes() + 1);
-        attempts++;
+        return null;
+      };
+
+      // Get first occurrence
+      let nextDate = getNextOccurrence(now);
+      if (!nextDate) return ['No upcoming occurrences found'];
+
+      // Get next 3 occurrences
+      for (let i = 0; i < 3; i++) {
+        if (nextDate) {
+          occurrences.push(formatDate(nextDate));
+          // Start looking from 1 minute after the last occurrence
+          nextDate = getNextOccurrence(new Date(nextDate.getTime() + 60000));
+        }
       }
 
       return occurrences.length > 0 ? occurrences : ['No upcoming occurrences found'];
