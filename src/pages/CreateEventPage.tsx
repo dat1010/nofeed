@@ -83,7 +83,12 @@ const CreateEventPage: React.FC = () => {
 
         // Check day of week
         if (dayOfWeek !== '*' && dayOfWeek !== '?') {
-          const cronDay = dayOfWeek === 'FRI' ? 5 : parseInt(dayOfWeek);
+          let cronDay: number;
+          if (dayOfWeek === 'FRI') {
+            cronDay = 5;
+          } else {
+            cronDay = parseInt(dayOfWeek);
+          }
           if (cronDay !== utcDayOfWeek) return false;
         }
 
@@ -107,15 +112,19 @@ const CreateEventPage: React.FC = () => {
       const getNextOccurrence = (startDate: Date): Date | null => {
         let currentDate = new Date(startDate);
         let attempts = 0;
-        const maxAttempts = 1000; // Prevent infinite loops
+        const maxAttempts = 10000; // Increased to handle longer intervals
 
         while (attempts < maxAttempts) {
           if (matchesCronPattern(currentDate)) {
             return currentDate;
           }
           
-          // Move to next minute
-          currentDate.setMinutes(currentDate.getMinutes() + 1);
+          // For weekly and monthly schedules, increment by days instead of minutes
+          if (dayOfWeek !== '*' || day !== '*') {
+            currentDate.setDate(currentDate.getDate() + 1);
+          } else {
+            currentDate.setMinutes(currentDate.getMinutes() + 1);
+          }
           attempts++;
         }
         return null;
@@ -129,8 +138,14 @@ const CreateEventPage: React.FC = () => {
       for (let i = 0; i < 3; i++) {
         if (nextDate) {
           occurrences.push(formatDate(nextDate));
-          // Start looking from 1 minute after the last occurrence
-          nextDate = getNextOccurrence(new Date(nextDate.getTime() + 60000));
+          // For weekly and monthly schedules, start looking from next day
+          const nextStartDate = new Date(nextDate);
+          if (dayOfWeek !== '*' || day !== '*') {
+            nextStartDate.setDate(nextStartDate.getDate() + 1);
+          } else {
+            nextStartDate.setMinutes(nextStartDate.getMinutes() + 1);
+          }
+          nextDate = getNextOccurrence(nextStartDate);
         }
       }
 
@@ -180,7 +195,7 @@ const CreateEventPage: React.FC = () => {
     });
 
     // Update next occurrences immediately after form data changes
-    if (name === 'scheduleTime' || name === 'presetSchedule') {
+    if (name === 'scheduleTime' || name === 'presetSchedule' || name === 'schedule') {
       const updatedSchedule = formData.scheduleType === 'preset' && name === 'scheduleTime'
         ? (() => {
             const utcTime = convertToUTC(value);
@@ -191,15 +206,11 @@ const CreateEventPage: React.FC = () => {
             }
             return formData.schedule;
           })()
-        : formData.schedule;
+        : name === 'schedule' ? value : formData.schedule;
       
       setNextOccurrences(getNextOccurrences(updatedSchedule));
     }
   };
-
-  useEffect(() => {
-    setNextOccurrences(getNextOccurrences(formData.schedule));
-  }, [formData.schedule]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
