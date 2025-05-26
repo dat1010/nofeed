@@ -32,6 +32,9 @@ const Navbar: React.FC = () => {
             <a className="navbar-item" href="/home">
               Home
             </a>
+            <a className="navbar-item" href="/my-events">
+              My Events
+            </a>
             {/* Add more navigation items here as needed */}
           </div>
 
