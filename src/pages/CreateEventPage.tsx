@@ -15,9 +15,9 @@ interface EventFormData {
 }
 
 const PRESET_SCHEDULES = {
-  'daily': { label: 'Daily', value: '0 {hour} * * ? *' },
-  'weekly-friday': { label: 'Weekly on Friday', value: '0 {hour} ? * FRI *' },
-  'monthly-first': { label: 'Monthly on 1st', value: '0 {hour} 1 * ? *' },
+  'daily': { label: 'Daily', value: '{minute} {hour} * * ? *' },
+  'weekly-friday': { label: 'Weekly on Friday', value: '{minute} {hour} ? * FRI *' },
+  'monthly-first': { label: 'Monthly on 1st', value: '{minute} {hour} 1 * ? *' },
   'custom': { label: 'Custom Schedule', value: '' }
 };
 
@@ -37,11 +37,14 @@ const CreateEventPage: React.FC = () => {
   });
 
   // Convert local time to UTC
-  const convertToUTC = (localTime: string): number => {
+  const convertToUTC = (localTime: string): { hours: number; minutes: number } => {
     const [hours, minutes] = localTime.split(':').map(Number);
     const date = new Date();
     date.setHours(hours, minutes, 0, 0);
-    return date.getUTCHours();
+    return {
+      hours: date.getUTCHours(),
+      minutes: date.getUTCMinutes()
+    };
   };
 
   // Parse cron expression and get next occurrences
@@ -102,9 +105,11 @@ const CreateEventPage: React.FC = () => {
       // If changing preset schedule or time, update the actual schedule
       if (name === 'presetSchedule' || name === 'scheduleTime') {
         if (newData.scheduleType === 'preset') {
-          const utcHour = convertToUTC(newData.scheduleTime);
+          const { hours, minutes } = convertToUTC(newData.scheduleTime);
           const scheduleTemplate = PRESET_SCHEDULES[newData.presetSchedule as keyof typeof PRESET_SCHEDULES].value;
-          newData.schedule = scheduleTemplate.replace('{hour}', utcHour.toString());
+          newData.schedule = scheduleTemplate
+            .replace('{hour}', hours.toString())
+            .replace('{minute}', minutes.toString());
         }
         if (name === 'presetSchedule') {
           newData.scheduleType = value === 'custom' ? 'custom' : 'preset';
@@ -117,7 +122,12 @@ const CreateEventPage: React.FC = () => {
     // Update next occurrences immediately after form data changes
     if (name === 'scheduleTime' || name === 'presetSchedule') {
       const updatedSchedule = name === 'scheduleTime' 
-        ? PRESET_SCHEDULES[formData.presetSchedule as keyof typeof PRESET_SCHEDULES].value.replace('{hour}', convertToUTC(value).toString())
+        ? (() => {
+            const { hours, minutes } = convertToUTC(value);
+            return PRESET_SCHEDULES[formData.presetSchedule as keyof typeof PRESET_SCHEDULES].value
+              .replace('{hour}', hours.toString())
+              .replace('{minute}', minutes.toString());
+          })()
         : formData.schedule;
       setNextOccurrences(getNextOccurrences(updatedSchedule));
     }
