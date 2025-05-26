@@ -26,7 +26,7 @@ const CreateEventPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nextOccurrences, setNextOccurrences] = useState<string[]>([]);
-  const [updateTrigger, setUpdateTrigger] = useState(0);
+  const [setUpdateTrigger] = useState(0);
   const [formData, setFormData] = useState<EventFormData>({
     name: '',
     description: '',
