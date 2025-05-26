@@ -158,78 +158,65 @@ const CreateEventPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    
+    // First, update the form data
     setFormData(prev => {
-      const newData = {
-        ...prev,
-        [name]: value
-      };
+      const newData = { ...prev, [name]: value };
       
-      // If changing preset schedule or time, update the actual schedule
-      if (name === 'presetSchedule' || name === 'scheduleTime') {
-        if (name === 'presetSchedule') {
-          newData.scheduleType = value === 'custom' ? 'custom' : 'preset';
-          if (value === 'custom') {
-            newData.schedule = '0 0 * * ? *'; // Default cron expression for custom
-          } else {
-            // When changing preset type, use current time to generate new schedule
-            const utcTime = convertToUTC(newData.scheduleTime);
-            if (utcTime) {
-              const scheduleTemplate = PRESET_SCHEDULES[value as keyof typeof PRESET_SCHEDULES].value;
-              newData.schedule = scheduleTemplate
-                .replace('{hour}', utcTime.hours.toString())
-                .replace('{minute}', utcTime.minutes.toString());
-            }
-          }
-        } else if (name === 'scheduleTime' && newData.scheduleType === 'preset') {
-          const utcTime = convertToUTC(value);
+      // Handle schedule type changes
+      if (name === 'presetSchedule') {
+        newData.scheduleType = value === 'custom' ? 'custom' : 'preset';
+        
+        // For custom schedule, set a default
+        if (value === 'custom') {
+          newData.schedule = '0 0 * * ? *';
+        } else {
+          // For preset schedules, update with current time
+          const utcTime = convertToUTC(newData.scheduleTime);
           if (utcTime) {
-            const scheduleTemplate = PRESET_SCHEDULES[newData.presetSchedule as keyof typeof PRESET_SCHEDULES].value;
-            newData.schedule = scheduleTemplate
+            const template = PRESET_SCHEDULES[value as keyof typeof PRESET_SCHEDULES].value;
+            newData.schedule = template
               .replace('{hour}', utcTime.hours.toString())
               .replace('{minute}', utcTime.minutes.toString());
           }
         }
       }
       
+      // Handle time changes
+      if (name === 'scheduleTime' && newData.scheduleType === 'preset') {
+        const utcTime = convertToUTC(value);
+        if (utcTime) {
+          const template = PRESET_SCHEDULES[newData.presetSchedule as keyof typeof PRESET_SCHEDULES].value;
+          newData.schedule = template
+            .replace('{hour}', utcTime.hours.toString())
+            .replace('{minute}', utcTime.minutes.toString());
+        }
+      }
+      
       return newData;
     });
-
-    // Immediately update next occurrences after form data changes
-    if (name === 'presetSchedule' || name === 'scheduleTime') {
-      const updatedSchedule = (() => {
-        if (name === 'presetSchedule') {
-          if (value === 'custom') {
-            return '0 0 * * ? *';
-          }
-          const utcTime = convertToUTC(formData.scheduleTime);
-          if (utcTime) {
-            return PRESET_SCHEDULES[value as keyof typeof PRESET_SCHEDULES].value
-              .replace('{hour}', utcTime.hours.toString())
-              .replace('{minute}', utcTime.minutes.toString());
-          }
-        } else if (name === 'scheduleTime') {
-          const utcTime = convertToUTC(value);
-          if (utcTime) {
-            return PRESET_SCHEDULES[formData.presetSchedule as keyof typeof PRESET_SCHEDULES].value
-              .replace('{hour}', utcTime.hours.toString())
-              .replace('{minute}', utcTime.minutes.toString());
-          }
-        }
-        return formData.schedule;
-      })();
-
-      console.log('Updating schedule to:', updatedSchedule);
-      setNextOccurrences(getNextOccurrences(updatedSchedule));
-    }
   };
 
-  // Update next occurrences whenever schedule changes
+  // Separate effect to handle next occurrences
   useEffect(() => {
-    console.log('Schedule changed:', formData.schedule);
-    const occurrences = getNextOccurrences(formData.schedule);
-    console.log('Next occurrences:', occurrences);
-    setNextOccurrences(occurrences);
-  }, [formData.schedule]);
+    const calculateNextOccurrences = () => {
+      try {
+        const schedule = formData.schedule;
+        if (!schedule) {
+          setNextOccurrences(['No schedule set']);
+          return;
+        }
+
+        const occurrences = getNextOccurrences(schedule);
+        setNextOccurrences(occurrences);
+      } catch (error) {
+        console.error('Error calculating next occurrences:', error);
+        setNextOccurrences(['Error calculating schedule']);
+      }
+    };
+
+    calculateNextOccurrences();
+  }, [formData.schedule, formData.presetSchedule, formData.scheduleTime]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
