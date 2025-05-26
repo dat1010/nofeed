@@ -153,6 +153,7 @@ const CreateEventPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    console.log('Input changed:', name, value);
     
     // First, update the form data
     setFormData(prev => {
@@ -160,6 +161,7 @@ const CreateEventPage: React.FC = () => {
       
       // Handle schedule type changes
       if (name === 'presetSchedule') {
+        console.log('Changing preset schedule to:', value);
         newData.scheduleType = value === 'custom' ? 'custom' : 'preset';
         
         // For custom schedule, set a default
@@ -175,16 +177,19 @@ const CreateEventPage: React.FC = () => {
               .replace('{minute}', utcTime.minutes.toString());
           }
         }
+        console.log('New schedule after preset change:', newData.schedule);
       }
       
       // Handle time changes
       if (name === 'scheduleTime' && newData.scheduleType === 'preset') {
+        console.log('Changing time to:', value);
         const utcTime = convertToUTC(value);
         if (utcTime) {
           const template = PRESET_SCHEDULES[newData.presetSchedule as keyof typeof PRESET_SCHEDULES].value;
           newData.schedule = template
             .replace('{hour}', utcTime.hours.toString())
             .replace('{minute}', utcTime.minutes.toString());
+          console.log('New schedule after time change:', newData.schedule);
         }
       }
       
@@ -194,15 +199,19 @@ const CreateEventPage: React.FC = () => {
 
   // Separate effect to handle next occurrences
   useEffect(() => {
+    console.log('Effect triggered with schedule:', formData.schedule);
     const calculateNextOccurrences = () => {
       try {
         const schedule = formData.schedule;
         if (!schedule) {
+          console.log('No schedule set');
           setNextOccurrences(['No schedule set']);
           return;
         }
 
+        console.log('Calculating next occurrences for schedule:', schedule);
         const occurrences = getNextOccurrences(schedule);
+        console.log('Calculated occurrences:', occurrences);
         setNextOccurrences(occurrences);
       } catch (error) {
         console.error('Error calculating next occurrences:', error);
@@ -212,6 +221,16 @@ const CreateEventPage: React.FC = () => {
 
     calculateNextOccurrences();
   }, [formData.schedule, formData.presetSchedule, formData.scheduleTime]);
+
+  // Add a debug effect to track form data changes
+  useEffect(() => {
+    console.log('Form data updated:', {
+      schedule: formData.schedule,
+      presetSchedule: formData.presetSchedule,
+      scheduleTime: formData.scheduleTime,
+      scheduleType: formData.scheduleType
+    });
+  }, [formData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
