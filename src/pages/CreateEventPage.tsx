@@ -193,6 +193,34 @@ const CreateEventPage: React.FC = () => {
       
       return newData;
     });
+
+    // Immediately update next occurrences after form data changes
+    if (name === 'presetSchedule' || name === 'scheduleTime') {
+      const updatedSchedule = (() => {
+        if (name === 'presetSchedule') {
+          if (value === 'custom') {
+            return '0 0 * * ? *';
+          }
+          const utcTime = convertToUTC(formData.scheduleTime);
+          if (utcTime) {
+            return PRESET_SCHEDULES[value as keyof typeof PRESET_SCHEDULES].value
+              .replace('{hour}', utcTime.hours.toString())
+              .replace('{minute}', utcTime.minutes.toString());
+          }
+        } else if (name === 'scheduleTime') {
+          const utcTime = convertToUTC(value);
+          if (utcTime) {
+            return PRESET_SCHEDULES[formData.presetSchedule as keyof typeof PRESET_SCHEDULES].value
+              .replace('{hour}', utcTime.hours.toString())
+              .replace('{minute}', utcTime.minutes.toString());
+          }
+        }
+        return formData.schedule;
+      })();
+
+      console.log('Updating schedule to:', updatedSchedule);
+      setNextOccurrences(getNextOccurrences(updatedSchedule));
+    }
   };
 
   // Update next occurrences whenever schedule changes
