@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
 import CreateEventPage from "./pages/CreateEventPage";
+import UserEventsPage from "./pages/UserEventsPage";
 import { getCookie } from "./utils/cookies";
 
 // Protected route component to check authentication
@@ -37,6 +38,14 @@ function App() {
           element={
             <ProtectedRoute>
               <CreateEventPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/my-events" 
+          element={
+            <ProtectedRoute>
+              <UserEventsPage />
             </ProtectedRoute>
           } 
         />
