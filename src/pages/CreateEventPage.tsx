@@ -60,41 +60,6 @@ const CreateEventPage: React.FC = () => {
       const occurrences: string[] = [];
       const now = new Date();
       
-      // Function to check if a date matches the cron pattern
-      const matchesCronPattern = (date: Date): boolean => {
-        const utcHour = date.getUTCHours();
-        const utcMinute = date.getUTCMinutes();
-        const utcDay = date.getUTCDate();
-        const utcMonth = date.getUTCMonth() + 1; // JavaScript months are 0-based
-        const utcDayOfWeek = date.getUTCDay();
-
-        // Check hour and minute
-        if (hour !== '*' && parseInt(hour) !== utcHour) return false;
-        if (minute !== '*' && parseInt(minute) !== utcMinute) return false;
-
-        // Check day of month
-        if (day !== '*' && day !== '?') {
-          const dayNum = parseInt(day);
-          if (dayNum !== utcDay) return false;
-        }
-
-        // Check month
-        if (month !== '*' && parseInt(month) !== utcMonth) return false;
-
-        // Check day of week
-        if (dayOfWeek !== '*' && dayOfWeek !== '?') {
-          let cronDay: number;
-          if (dayOfWeek === 'FRI') {
-            cronDay = 5;
-          } else {
-            cronDay = parseInt(dayOfWeek);
-          }
-          if (cronDay !== utcDayOfWeek) return false;
-        }
-
-        return true;
-      };
-
       // Function to format date with timezone
       const formatDate = (date: Date): string => {
         return date.toLocaleString(undefined, {
@@ -112,19 +77,55 @@ const CreateEventPage: React.FC = () => {
       const getNextOccurrence = (startDate: Date): Date | null => {
         let currentDate = new Date(startDate);
         let attempts = 0;
-        const maxAttempts = 10000; // Increased to handle longer intervals
+        const maxAttempts = 1000;
 
         while (attempts < maxAttempts) {
-          if (matchesCronPattern(currentDate)) {
+          const utcHour = currentDate.getUTCHours();
+          const utcMinute = currentDate.getUTCMinutes();
+          const utcDay = currentDate.getUTCDate();
+          const utcMonth = currentDate.getUTCMonth() + 1;
+          const utcDayOfWeek = currentDate.getUTCDay();
+
+          // Check if current date matches the schedule
+          let matches = true;
+
+          // Check hour and minute
+          if (hour !== '*' && parseInt(hour) !== utcHour) matches = false;
+          if (minute !== '*' && parseInt(minute) !== utcMinute) matches = false;
+
+          // Check day of month
+          if (day !== '*' && day !== '?') {
+            const dayNum = parseInt(day);
+            if (dayNum !== utcDay) matches = false;
+          }
+
+          // Check month
+          if (month !== '*' && parseInt(month) !== utcMonth) matches = false;
+
+          // Check day of week
+          if (dayOfWeek !== '*' && dayOfWeek !== '?') {
+            let cronDay: number;
+            if (dayOfWeek === 'FRI') {
+              cronDay = 5;
+            } else {
+              cronDay = parseInt(dayOfWeek);
+            }
+            if (cronDay !== utcDayOfWeek) matches = false;
+          }
+
+          if (matches) {
             return currentDate;
           }
-          
-          // For weekly and monthly schedules, increment by days instead of minutes
+
+          // Increment date based on schedule type
           if (dayOfWeek !== '*' || day !== '*') {
+            // For weekly/monthly schedules, increment by days
             currentDate.setDate(currentDate.getDate() + 1);
           } else {
+            // For daily schedules, increment by minutes
             currentDate.setMinutes(currentDate.getMinutes() + 1);
           }
+
           attempts++;
         }
         return null;
@@ -138,14 +139,8 @@ const CreateEventPage: React.FC = () => {
       for (let i = 0; i < 3; i++) {
         if (nextDate) {
           occurrences.push(formatDate(nextDate));
-          // For weekly and monthly schedules, start looking from next day
-          const nextStartDate = new Date(nextDate);
-          if (dayOfWeek !== '*' || day !== '*') {
-            nextStartDate.setDate(nextStartDate.getDate() + 1);
-          } else {
-            nextStartDate.setMinutes(nextStartDate.getMinutes() + 1);
-          }
-          nextDate = getNextOccurrence(nextStartDate);
+          // Start looking from 1 minute after the last occurrence
+          nextDate = getNextOccurrence(new Date(nextDate.getTime() + 60000));
         }
       }
 
