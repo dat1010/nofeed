@@ -6,6 +6,7 @@ import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
 import CreateEventPage from "./pages/CreateEventPage";
 import UserEventsPage from "./pages/UserEventsPage";
+import HealthCheckPage from "./pages/HealthCheckPage";
 import { getCookie } from "./utils/cookies";
 
 // Protected route component to check authentication
@@ -25,6 +26,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/healthcheck" element={<HealthCheckPage />} />
         <Route 
           path="/home" 
           element={
