@@ -266,126 +266,132 @@ const CreateEventPage: React.FC = () => {
       <div className="container mt-5">
         <div className="columns is-centered">
           <div className="column is-half">
-            <div className="box">
-              <h1 className="title">Create Scheduled Event</h1>
-              
-              {error && (
-                <div className="notification is-danger">
-                  {error}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit}>
-                <div className="field">
-                  <label className="label">Event Name</label>
-                  <div className="control">
-                    <input
-                      className="input"
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="my-scheduled-event"
-                      required
-                    />
-                  </div>
-                  <p className="help">A unique identifier for your event</p>
-                </div>
-
-                <div className="field">
-                  <label className="label">Description</label>
-                  <div className="control">
-                    <input
-                      className="input"
-                      type="text"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      placeholder="A scheduled event that runs daily"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="field">
-                  <label className="label">Schedule</label>
-                  <div className="control">
-                    <div className="select is-fullwidth mb-2">
-                      <select
-                        name="presetSchedule"
-                        value={formData.presetSchedule}
-                        onChange={handleInputChange}
-                      >
-                        {Object.entries(PRESET_SCHEDULES).map(([key, { label }]) => (
-                          <option key={key} value={key}>{label}</option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    {formData.scheduleType === 'preset' && (
-                      <div className="field">
-                        <div className="control">
-                          <input
-                            className="input"
-                            type="text"
-                            name="scheduleTime"
-                            value={formData.scheduleTime}
-                            onChange={handleInputChange}
-                            placeholder="HH:MM"
-                            pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
-                            required
-                          />
-                        </div>
-                        <p className="help">Enter time in 24-hour format (e.g., 14:30 for 2:30 PM)</p>
-                      </div>
-                    )}
-                    
-                    {formData.scheduleType === 'custom' && (
+            <div className="card">
+              <div className="card-content">
+                <h1 className="title">Create Scheduled Event</h1>
+                {error && <div className="notification is-danger">{error}</div>}
+                <form onSubmit={handleSubmit}>
+                  <div className="field">
+                    <label className="label">Event Name</label>
+                    <div className="control">
                       <input
                         className="input"
                         type="text"
-                        name="schedule"
-                        value={formData.schedule}
+                        name="name"
+                        value={formData.name}
                         onChange={handleInputChange}
-                        placeholder="0 12 * * ? *"
                         required
                       />
-                    )}
+                    </div>
                   </div>
-                  <p className="help">
-                    {formData.scheduleType === 'custom' 
-                      ? 'Format: minute hour day month day-of-week year (in UTC)'
-                      : 'Select a preset schedule and time, or choose custom for more options'}
-                  </p>
-                </div>
 
-                <div className="field">
-                  <label className="label">Next Occurrences (Local Time)</label>
-                  <div className="box">
-                    {nextOccurrences.length > 0 ? (
-                      <ul>
-                        {nextOccurrences.map((date, index) => (
-                          <li key={`${date}-${index}`}>{date}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p>No upcoming occurrences found</p>
-                    )}
+                  <div className="field">
+                    <label className="label">Description</label>
+                    <div className="control">
+                      <textarea
+                        className="textarea"
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="field is-grouped">
-                  <div className="control">
-                    <button
-                      type="submit"
-                      className="button is-link"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'Creating...' : 'Create Event'}
-                    </button>
+                  <div className="field">
+                    <label className="label">Schedule Type</label>
+                    <div className="control">
+                      <div className="select is-fullwidth">
+                        <select
+                          name="presetSchedule"
+                          value={formData.presetSchedule}
+                          onChange={handleInputChange}
+                        >
+                          {Object.entries(PRESET_SCHEDULES).map(([key, { label }]) => (
+                            <option key={key} value={key}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </form>
+
+                  {formData.scheduleType === 'preset' && (
+                    <div className="field">
+                      <label className="label">Time (Local)</label>
+                      <div className="control">
+                        <input
+                          className="input"
+                          type="time"
+                          name="scheduleTime"
+                          value={formData.scheduleTime}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {formData.scheduleType === 'custom' && (
+                    <div className="field">
+                      <label className="label">Custom Schedule (Cron Expression)</label>
+                      <div className="control">
+                        <input
+                          className="input"
+                          type="text"
+                          name="schedule"
+                          value={formData.schedule}
+                          onChange={handleInputChange}
+                          placeholder="0 12 * * ? *"
+                          required
+                        />
+                      </div>
+                      <p className="help">Enter a valid cron expression</p>
+                    </div>
+                  )}
+
+                  <div className="field">
+                    <label className="label">Payload (JSON)</label>
+                    <div className="control">
+                      <textarea
+                        className="textarea"
+                        name="payload"
+                        value={formData.payload}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {nextOccurrences.length > 0 && (
+                    <div className="field">
+                      <label className="label">Next Occurrences</label>
+                      <div className="card">
+                        <div className="card-content">
+                          <ul>
+                            {nextOccurrences.map((occurrence, index) => (
+                              <li key={index}>{occurrence}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="field">
+                    <div className="control">
+                      <button
+                        className={`button is-primary ${isSubmitting ? 'is-loading' : ''}`}
+                        type="submit"
+                        disabled={isSubmitting}
+                      >
+                        Create Event
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
