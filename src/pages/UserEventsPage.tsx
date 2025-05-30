@@ -47,29 +47,33 @@ const UserEventsPage: React.FC = () => {
       <div className="container mt-5">
         <div className="columns is-centered">
           <div className="column is-half">
-            <div className="box">
-              <h1 className="title">My Events</h1>
-              {loading && <div>Loading events...</div>}
-              {error && <div className="notification is-danger">{error}</div>}
-              {!loading && !error && (
-                <>
-                  {events.length === 0 ? (
-                    <div className="notification is-info">No events found.</div>
-                  ) : (
-                    <ul>
-                      {events.map(event => (
-                        <li key={event.id} className="mb-4">
-                          <div className="box">
-                            <strong>{event.name}</strong>
-                            <p>{event.description}</p>
-                            <span className="tag is-light">Schedule: {event.schedule}</span>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </>
-              )}
+            <div className="card">
+              <div className="card-content">
+                <h1 className="title">My Events</h1>
+                {loading && <div>Loading events...</div>}
+                {error && <div className="notification is-danger">{error}</div>}
+                {!loading && !error && (
+                  <>
+                    {events.length === 0 ? (
+                      <div className="notification is-info">No events found.</div>
+                    ) : (
+                      <ul>
+                        {events.map(event => (
+                          <li key={event.id} className="mb-4">
+                            <div className="card">
+                              <div className="card-content">
+                                <strong>{event.name}</strong>
+                                <p>{event.description}</p>
+                                <span className="tag is-light">Schedule: {event.schedule}</span>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
