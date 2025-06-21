@@ -37,37 +37,27 @@ const fetchPosts = async (
     const raw = getCookie("id_token") ||
       (api.defaults.headers.common["Authorization"] as string)?.split(" ")[1];
 
-    console.log("Raw token:", raw ? "Token exists" : "No token found");
-
     // 2. Decode it
     let auth0UserId = null;
     if (raw) {
       try {
         const decoded = jwtDecode<JwtPayload>(raw);
-        console.log("Full JWT payload:", decoded);
         auth0UserId = decoded.sub;
       } catch (decodeError) {
         console.error("Error decoding JWT:", decodeError);
       }
     }
 
-    console.log("Decoded auth0UserId:", auth0UserId);
-
     // 3. Build params
     const params: Record<string, string> = {};
     if (auth0UserId) {
       params.author = auth0UserId;
-      console.log("Using author param:", auth0UserId);
-    } else {
-      console.log("No auth0UserId found, fetching all posts");
     }
 
     // 4. Fetch with ?author=<userId>
-    console.log("Making request to /posts with params:", params);
     const response = await api.get<Post[]>("/posts", { params });
     const postsData = response.data || [];
 
-    console.log("Response data:", postsData);
     setPosts(Array.isArray(postsData) ? postsData : []);
     setError(null);
   } catch (err: any) {
@@ -112,9 +102,6 @@ const PostList: React.FC = () => {
       </div>
     );
   }
-
-  // Debug: log posts to console
-  console.log('Posts:', posts);
 
   return (
     <div className="feed">
