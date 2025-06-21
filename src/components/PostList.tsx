@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { jwtDecode } from "jwt-decode";
+import { getCookie } from "../utils/cookies";
 import "../styles/feed.css";
 
 interface Post {
@@ -33,7 +34,7 @@ const fetchPosts = async (
 
   try {
     // 1. Get the raw token
-    const raw = localStorage.getItem("token") ||
+    const raw = getCookie("id_token") ||
       (api.defaults.headers.common["Authorization"] as string)?.split(" ")[1];
 
     console.log("Raw token:", raw ? "Token exists" : "No token found");
