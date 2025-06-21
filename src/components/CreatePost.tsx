@@ -31,8 +31,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
       await api.post("/posts", 
         {
           title,
-          content,
-          published: true
+          content
         },
         {
           headers: {
