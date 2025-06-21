@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import ScheduledEventButton from "./ScheduledEventButton";
+import Logo from "./Logo";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -21,19 +22,27 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="navbar is-primary" role="navigation" aria-label="main navigation">
+    <nav className="navbar is-primary navbar-enhanced" role="navigation" aria-label="main navigation">
       <div className="container">
         <div className="navbar-brand">
-          <span className="navbar-item has-text-weight-bold is-size-4">NoFeed</span>
+          <div className="navbar-item">
+            <Logo size={32} showText={true} />
+          </div>
         </div>
 
         <div className="navbar-menu">
           <div className="navbar-start">
-            <a className="navbar-item" href="/home">
-              Home
+            <a className="navbar-item has-text-white navbar-icon" href="/home">
+              <span className="icon">
+                <i className="fas fa-home"></i>
+              </span>
+              <span>Home</span>
             </a>
-            <a className="navbar-item" href="/my-events">
-              My Events
+            <a className="navbar-item has-text-white navbar-icon" href="/my-events">
+              <span className="icon">
+                <i className="fas fa-calendar-alt"></i>
+              </span>
+              <span>My Events</span>
             </a>
             {/* Add more navigation items here as needed */}
           </div>
@@ -45,7 +54,10 @@ const Navbar: React.FC = () => {
             <div className="navbar-item">
               <div className="buttons">
                 <button className="button is-light" onClick={handleLogout}>
-                  Logout
+                  <span className="icon">
+                    <i className="fas fa-sign-out-alt"></i>
+                  </span>
+                  <span>Logout</span>
                 </button>
               </div>
             </div>

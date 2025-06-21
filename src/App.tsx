@@ -8,6 +8,7 @@ import CreateEventPage from "./pages/CreateEventPage";
 import UserEventsPage from "./pages/UserEventsPage";
 import HealthCheckPage from "./pages/HealthCheckPage";
 import { getCookie } from "./utils/cookies";
+import "./styles/logo.css";
 
 // Protected route component to check authentication
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
