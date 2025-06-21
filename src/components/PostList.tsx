@@ -73,10 +73,50 @@ const PostList: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    const raw = getCookie("id_token");
+    if (raw) {
+      try {
+        const decoded = jwtDecode<JwtPayload>(raw);
+        setCurrentUserId(decoded.sub);
+      } catch (decodeError) {
+        console.error("Error decoding JWT:", decodeError);
+      }
+    }
+    
     fetchPosts(setPosts, setError, setIsLoading);
   }, []);
+
+  const handleDeletePost = async (postId: string) => {
+    if (!window.confirm("Are you sure you want to delete this post?")) {
+      return;
+    }
+
+    try {
+      const token = getCookie("id_token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      await api.delete(`/posts/${postId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      // Remove the deleted post from the local state
+      setPosts(posts.filter(post => post.id !== postId));
+    } catch (err: any) {
+      console.error("Error deleting post:", err);
+      if (err.response?.data?.error === "Authorization header is required") {
+        alert("You can only delete your own posts.");
+      } else {
+        alert("Failed to delete post. Please try again.");
+      }
+    }
+  };
 
   if (isLoading) {
     return (
@@ -108,10 +148,25 @@ const PostList: React.FC = () => {
       {posts.map((post) => (
         <div key={post.id} className="card mb-5">
           <div className="card-content">
-            <p className="has-text-grey-light is-size-7 mb-2">
-              {post.created_at && new Date(post.created_at).toLocaleDateString()}
-            </p>
-            <p className="is-5 has-text-weight-normal mb-1" style={{ wordBreak: 'break-word' }}>{post.content}</p>
+            <div className="is-flex is-justify-content-space-between is-align-items-flex-start">
+              <div className="is-flex-grow-1">
+                <p className="has-text-grey-light is-size-7 mb-2">
+                  {post.created_at && new Date(post.created_at).toLocaleDateString()}
+                </p>
+                <p className="is-5 has-text-weight-normal mb-1" style={{ wordBreak: 'break-word' }}>{post.content}</p>
+              </div>
+              {currentUserId && post.auth0_user_id === currentUserId && (
+                <button
+                  className="button is-small is-danger is-light ml-2"
+                  onClick={() => handleDeletePost(post.id)}
+                  title="Delete post"
+                >
+                  <span className="icon is-small">
+                    <i className="fas fa-trash"></i>
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       ))}
