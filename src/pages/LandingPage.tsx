@@ -71,6 +71,17 @@ const LandingPage: React.FC = () => {
               </span>
               <span>Sign Up</span>
             </button>
+            <a
+              href="https://discourse.nofeed.zone/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="button is-link is-medium"
+            >
+              <span className="icon">
+                <i className="fas fa-comments"></i>
+              </span>
+              <span>Community</span>
+            </a>
           </div>
           
           <div className="mt-6">

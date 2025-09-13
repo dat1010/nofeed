@@ -44,6 +44,12 @@ const Navbar: React.FC = () => {
               </span>
               <span>My Events</span>
             </a>
+            <a className="navbar-item has-text-white navbar-icon" href="https://discourse.nofeed.zone/" target="_blank" rel="noopener noreferrer">
+              <span className="icon">
+                <i className="fas fa-comments"></i>
+              </span>
+              <span>Community</span>
+            </a>
             {/* Add more navigation items here as needed */}
           </div>
 
