@@ -72,7 +72,7 @@ const LandingPage: React.FC = () => {
               <span>Sign Up</span>
             </button>
             <a
-              href="https://discourse.nofeed.zone/"
+              href="https://discourse.nofeed.zone/?utm_source=app&utm_medium=landing&utm_campaign=community"
               target="_blank"
               rel="noopener noreferrer"
               className="button is-link is-medium"
@@ -80,7 +80,7 @@ const LandingPage: React.FC = () => {
               <span className="icon">
                 <i className="fas fa-comments"></i>
               </span>
-              <span>Community</span>
+              <span>Community Forum</span>
             </a>
           </div>
           
@@ -88,6 +88,16 @@ const LandingPage: React.FC = () => {
             <p className="has-text-light is-size-7 tagline-glow">
               Break free from the algorithm. Connect meaningfully.
             </p>
+          </div>
+          <div className="mt-3">
+            <a
+              href="https://discourse.nofeed.zone/?utm_source=app&utm_medium=landing_footer&utm_campaign=community"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="is-size-7 has-text-info"
+            >
+              Have questions? Join the Community Forum
+            </a>
           </div>
         </div>
       </div>

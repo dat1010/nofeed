@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage";
 import CreateEventPage from "./pages/CreateEventPage";
 import UserEventsPage from "./pages/UserEventsPage";
 import HealthCheckPage from "./pages/HealthCheckPage";
+import CommunityPage from "./pages/CommunityPage";
 import { getCookie } from "./utils/cookies";
 import "./styles/logo.css";
 
@@ -28,6 +29,14 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/healthcheck" element={<HealthCheckPage />} />
+        <Route 
+          path="/community" 
+          element={
+            <ProtectedRoute>
+              <CommunityPage />
+            </ProtectedRoute>
+          } 
+        />
         <Route 
           path="/home" 
           element={
