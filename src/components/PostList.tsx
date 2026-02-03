@@ -146,18 +146,33 @@ const PostList: React.FC = () => {
   return (
     <div className="feed">
       {posts.map((post) => (
-        <div key={post.id} className="card mb-5">
+        <div key={post.id} className="card post-card mb-5">
           <div className="card-content">
             <div className="is-flex is-justify-content-space-between is-align-items-flex-start">
               <div className="is-flex-grow-1">
-                <p className="has-text-grey-light is-size-7 mb-2">
-                  {post.created_at && new Date(post.created_at).toLocaleDateString()}
+                <div className="post-meta">
+                  <div className="post-avatar">
+                    {currentUserId && post.auth0_user_id === currentUserId ? "Y" : "N"}
+                  </div>
+                  <div>
+                    <div className="post-author">
+                      {currentUserId && post.auth0_user_id === currentUserId ? "You" : "NoFeed"}
+                      {currentUserId && post.auth0_user_id === currentUserId && (
+                        <span className="post-badge">Creator</span>
+                      )}
+                    </div>
+                    <div className="post-time">
+                      {post.created_at && new Date(post.created_at).toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+                <p className="is-5 has-text-weight-normal mb-1" style={{ wordBreak: 'break-word' }}>
+                  {post.content}
                 </p>
-                <p className="is-5 has-text-weight-normal mb-1" style={{ wordBreak: 'break-word' }}>{post.content}</p>
               </div>
               {currentUserId && post.auth0_user_id === currentUserId && (
                 <button
-                  className="button is-small is-danger is-light ml-2"
+                  className="button is-small is-danger is-light ml-2 post-delete"
                   onClick={() => handleDeletePost(post.id)}
                   title="Delete post"
                 >

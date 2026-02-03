@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
     <nav className="navbar is-primary navbar-enhanced" role="navigation" aria-label="main navigation">
       <div className="container">
         <div className="navbar-brand">
-          <div className="navbar-item">
+          <div className="navbar-item brand">
             <Logo size={32} showText={true} />
           </div>
         </div>

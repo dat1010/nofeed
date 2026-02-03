@@ -9,6 +9,7 @@ interface CreatePostProps {
 const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const charCount = content.trim().length;
 
   const generateTitle = (text: string): string => {
     const words = text.trim().split(/\s+/);
@@ -49,29 +50,29 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
   };
 
   return (
-    <div className="box">
+    <div className="composer-card">
       <form onSubmit={handleSubmit}>
         <div className="field">
           <div className="control">
+            <label className="label has-text-light">Share a thought</label>
             <textarea
-              className="textarea"
-              placeholder="What's on your mind?"
+              className="textarea composer-textarea"
+              placeholder="What's sparking right now?"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={3}
             />
           </div>
         </div>
-        <div className="field">
-          <div className="control">
-            <button
-              className={`button is-primary ${isSubmitting ? "is-loading" : ""}`}
-              type="submit"
-              disabled={!content.trim() || isSubmitting}
-            >
-              Post
-            </button>
-          </div>
+        <div className="composer-footer">
+          <span>{charCount} chars</span>
+          <button
+            className={`button is-primary ${isSubmitting ? "is-loading" : ""}`}
+            type="submit"
+            disabled={!content.trim() || isSubmitting}
+          >
+            Post
+          </button>
         </div>
       </form>
     </div>
