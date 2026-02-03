@@ -46,6 +46,62 @@ a {
   background: rgba(125, 178, 255, 0.35);
 }
 
+.button {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  transition: transform 0.18s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button.is-primary {
+  background: linear-gradient(135deg, #7bb2ff, #6df0c2);
+  border: none;
+  color: #0f1020;
+  box-shadow: 0 12px 26px rgba(109, 240, 194, 0.25);
+}
+
+.button.is-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(123, 178, 255, 0.35);
+}
+
+.button.is-light {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-0);
+}
+
+.button.is-light:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.button.is-link {
+  background: linear-gradient(135deg, #ff7a7a, #7bb2ff);
+  border: none;
+  color: #0f1020;
+  box-shadow: 0 12px 26px rgba(255, 122, 122, 0.2);
+}
+
+.button.is-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(255, 122, 122, 0.35);
+}
+
+.button.is-danger.is-light {
+  background: rgba(255, 122, 122, 0.12);
+  border: 1px solid rgba(255, 122, 122, 0.35);
+  color: #ffd6d6;
+}
+
+.button.is-danger.is-light:hover {
+  background: rgba(255, 122, 122, 0.2);
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
