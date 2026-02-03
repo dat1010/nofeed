@@ -1,10 +1,49 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
+:root {
+  --bg-0: #0f1020;
+  --bg-1: #14162b;
+  --bg-2: #1b1f3a;
+  --accent-1: #ff7a7a;
+  --accent-2: #6df0c2;
+  --accent-3: #7bb2ff;
+  --text-0: #f4f6ff;
+  --text-1: #c9d2ff;
+  --text-2: #9aa6e6;
+  --card: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(255, 255, 255, 0.12);
+  --glow: 0 10px 30px rgba(123, 178, 255, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  color: var(--text-0);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(125, 178, 255, 0.2), transparent 60%),
+    radial-gradient(900px 500px at 90% 0%, rgba(109, 240, 194, 0.18), transparent 60%),
+    linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: "Fraunces", serif;
+  letter-spacing: 0.2px;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: rgba(125, 178, 255, 0.35);
 }
 
 code {
