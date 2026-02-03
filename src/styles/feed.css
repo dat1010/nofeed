@@ -24,6 +24,7 @@
   box-shadow: var(--glow);
   backdrop-filter: blur(12px);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.3s ease;
+  animation: cardIn 0.45s ease both;
 }
 
 .post-card:hover {
@@ -31,6 +32,17 @@
   border-color: rgba(123, 178, 255, 0.4);
   box-shadow: 0 16px 40px rgba(123, 178, 255, 0.2);
 }
+
+.post-card:nth-child(1) { animation-delay: 0.02s; }
+.post-card:nth-child(2) { animation-delay: 0.05s; }
+.post-card:nth-child(3) { animation-delay: 0.08s; }
+.post-card:nth-child(4) { animation-delay: 0.11s; }
+.post-card:nth-child(5) { animation-delay: 0.14s; }
+.post-card:nth-child(6) { animation-delay: 0.17s; }
+.post-card:nth-child(7) { animation-delay: 0.2s; }
+.post-card:nth-child(8) { animation-delay: 0.23s; }
+.post-card:nth-child(9) { animation-delay: 0.26s; }
+.post-card:nth-child(10) { animation-delay: 0.29s; }
 
 .post-meta {
   display: flex;
@@ -110,6 +122,37 @@
   margin-top: 0.75rem;
   color: var(--text-2);
   font-size: 0.85rem;
+}
+
+.empty-state {
+  border-radius: 22px;
+  padding: 2rem;
+  background: linear-gradient(140deg, rgba(123, 178, 255, 0.15), rgba(109, 240, 194, 0.1));
+  border: 1px solid rgba(123, 178, 255, 0.35);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.empty-state h3 {
+  color: var(--text-0);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: var(--text-1);
+  max-width: 28rem;
+  margin: 0 auto 1rem auto;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Dark mode support */

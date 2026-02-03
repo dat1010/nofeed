@@ -137,8 +137,15 @@ const PostList: React.FC = () => {
 
   if (posts.length === 0) {
     return (
-      <div className="notification is-info is-light">
-        No posts yet. Be the first to post something!
+      <div className="empty-state">
+        <h3 className="title is-4">No feed. On purpose.</h3>
+        <p>
+          This space only wakes up when you share something real. Drop a thought,
+          a question, or a small spark to get things flowing.
+        </p>
+        <p className="is-size-7 has-text-grey-light">
+          Tip: your first post sets the tone for your corner of NoFeed.
+        </p>
       </div>
     );
   }
