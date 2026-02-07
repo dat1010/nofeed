@@ -1,23 +1,23 @@
 // src/App.tsx
 
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
 import CreateEventPage from "./pages/CreateEventPage";
 import UserEventsPage from "./pages/UserEventsPage";
 import HealthCheckPage from "./pages/HealthCheckPage";
 import CommunityPage from "./pages/CommunityPage";
-import { getCookie } from "./utils/cookies";
+import { getValidToken, redirectToLogin } from "./utils/auth";
 import "./styles/logo.css";
 
 // Protected route component to check authentication
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = getCookie("id_token");
+  const token = getValidToken();
   
   if (!token) {
-    // Redirect to landing page if not authenticated
-    return <Navigate to="/" />;
+    redirectToLogin();
+    return null;
   }
   
   return <>{children}</>;
@@ -68,4 +68,3 @@ function App() {
 }
 
 export default App;
-

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import ScheduledEventButton from "./ScheduledEventButton";
 import Logo from "./Logo";
+import { clearAuthCookies } from "../utils/auth";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -10,13 +11,11 @@ const Navbar: React.FC = () => {
   const handleLogout = async () => {
     try {
       await api.get('/logout');
-      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      clearAuthCookies();
       navigate("/");
     } catch (error) {
       console.error("Logout error:", error);
-      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie = "id_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      clearAuthCookies();
       navigate("/");
     }
   };

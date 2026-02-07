@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
-import { getCookie } from '../utils/cookies';
+import { getValidToken, redirectToLogin } from '../utils/auth';
 import api from '../services/api';
 
 interface Event {
@@ -21,13 +21,13 @@ const UserEventsPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = getCookie('id_token');
+        const token = getValidToken();
         if (!token) {
-          throw new Error('Please log in to view your events');
+          redirectToLogin();
+          return;
         }
         const response = await api.get('/events', {
           headers: {
-            'Authorization': `Bearer ${token}`,
             'accept': 'application/json',
           },
         });

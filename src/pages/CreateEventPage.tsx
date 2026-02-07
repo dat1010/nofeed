@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { getCookie } from '../utils/cookies';
+import { getValidToken, redirectToLogin } from '../utils/auth';
 import api from '../services/api';
 
 interface EventFormData {
@@ -225,9 +225,10 @@ const CreateEventPage: React.FC = () => {
     setError(null);
 
     try {
-      const token = getCookie("id_token");
+      const token = getValidToken();
       if (!token) {
-        throw new Error('Please log in to create events');
+        redirectToLogin();
+        return;
       }
 
       // Parse the payload string to ensure it's valid JSON
@@ -243,10 +244,6 @@ const CreateEventPage: React.FC = () => {
         description: formData.description,
         schedule: formData.schedule,
         payload: parsedPayload
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
       });
 
       console.log('Event created:', response.data);
