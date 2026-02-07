@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { jwtDecode } from "jwt-decode";
-import { getCookie } from "../utils/cookies";
+import { getValidToken, redirectToLogin } from "../utils/auth";
 import "../styles/feed.css";
 
 interface Post {
@@ -34,8 +34,13 @@ const fetchPosts = async (
 
   try {
     // 1. Get the raw token
-    const raw = getCookie("id_token") ||
-      (api.defaults.headers.common["Authorization"] as string)?.split(" ")[1];
+    const raw = getValidToken();
+    if (!raw) {
+      setError("Session expired. Redirecting to login.");
+      setIsLoading(false);
+      redirectToLogin();
+      return;
+    }
 
     // 2. Decode it
     let auth0UserId = null;
@@ -76,16 +81,19 @@ const PostList: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const raw = getCookie("id_token");
-    if (raw) {
-      try {
-        const decoded = jwtDecode<JwtPayload>(raw);
-        setCurrentUserId(decoded.sub);
-      } catch (decodeError) {
-        console.error("Error decoding JWT:", decodeError);
-      }
+    const raw = getValidToken();
+    if (!raw) {
+      redirectToLogin();
+      return;
     }
-    
+
+    try {
+      const decoded = jwtDecode<JwtPayload>(raw);
+      setCurrentUserId(decoded.sub);
+    } catch (decodeError) {
+      console.error("Error decoding JWT:", decodeError);
+    }
+
     fetchPosts(setPosts, setError, setIsLoading);
   }, []);
 
@@ -95,16 +103,13 @@ const PostList: React.FC = () => {
     }
 
     try {
-      const token = getCookie("id_token");
+      const token = getValidToken();
       if (!token) {
-        throw new Error("No authentication token found");
+        redirectToLogin();
+        return;
       }
 
-      await api.delete(`/posts/${postId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      await api.delete(`/posts/${postId}`);
 
       // Remove the deleted post from the local state
       setPosts(posts.filter(post => post.id !== postId));

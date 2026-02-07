@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getCookie } from "../utils/cookies";
+import { getValidToken, redirectToLogin } from "../utils/auth";
 import Logo from "../components/Logo";
 
 const LandingPage: React.FC = () => {
@@ -11,7 +11,7 @@ const LandingPage: React.FC = () => {
   useEffect(() => {
     // Only redirect if we're exactly on the root path
     if (window.location.pathname === "/" || window.location.pathname === "") {
-      const token = getCookie("id_token");
+      const token = getValidToken();
       if (token) {
         navigate("/home");
       }
@@ -21,7 +21,7 @@ const LandingPage: React.FC = () => {
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      window.location.href = "https://api.nofeed.zone/api/login";
+      redirectToLogin();
     } catch (error) {
       console.error("Login error:", error);
       setIsLoading(false);
@@ -31,7 +31,7 @@ const LandingPage: React.FC = () => {
   const handleSignup = async () => {
     setIsLoading(true);
     try {
-      window.location.href = "https://api.nofeed.zone/api/login";
+      redirectToLogin();
     } catch (error) {
       console.error("Signup error:", error);
       setIsLoading(false);
