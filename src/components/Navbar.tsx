@@ -1,23 +1,11 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../services/api";
 import ScheduledEventButton from "./ScheduledEventButton";
 import Logo from "./Logo";
-import { clearAuthCookies } from "../utils/auth";
+import { redirectToLogout } from "../utils/auth";
 
 const Navbar: React.FC = () => {
-  const navigate = useNavigate();
-
   const handleLogout = async () => {
-    try {
-      await api.get('/logout');
-      clearAuthCookies();
-      navigate("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-      clearAuthCookies();
-      navigate("/");
-    }
+    redirectToLogout();
   };
 
   return (

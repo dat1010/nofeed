@@ -1,6 +1,6 @@
 // src/App.tsx
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
@@ -8,18 +8,68 @@ import CreateEventPage from "./pages/CreateEventPage";
 import UserEventsPage from "./pages/UserEventsPage";
 import HealthCheckPage from "./pages/HealthCheckPage";
 import CommunityPage from "./pages/CommunityPage";
-import { getValidToken, redirectToLogin } from "./utils/auth";
+import { redirectToLogin, refreshSession } from "./utils/auth";
 import "./styles/logo.css";
+
+const getApiBaseUrl = () => {
+  if (process.env.NODE_ENV === "development") {
+    return "/api";
+  }
+  return "https://api.nofeed.zone/api";
+};
 
 // Protected route component to check authentication
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = getValidToken();
-  
-  if (!token) {
+  const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const checkAuth = async () => {
+      try {
+        const res = await fetch(`${getApiBaseUrl()}/me`, {
+          credentials: "include",
+        });
+        if (!active) {
+          return;
+        }
+        if (res.ok) {
+          setIsAuthed(true);
+          return;
+        }
+        const refreshed = await refreshSession();
+        if (!active) {
+          return;
+        }
+        if (refreshed) {
+          const res2 = await fetch(`${getApiBaseUrl()}/me`, {
+            credentials: "include",
+          });
+          setIsAuthed(res2.ok);
+        } else {
+          setIsAuthed(false);
+        }
+      } catch {
+        if (!active) {
+          return;
+        }
+        setIsAuthed(false);
+      }
+    };
+    checkAuth();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (isAuthed === null) {
+    return null;
+  }
+
+  if (!isAuthed) {
     redirectToLogin();
     return null;
   }
-  
+
   return <>{children}</>;
 };
 

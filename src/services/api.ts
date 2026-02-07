@@ -1,5 +1,5 @@
 import axios from "axios";
-import { clearAuthCookies, getValidToken, redirectToLogin } from "../utils/auth";
+import { redirectToLogin, refreshSession } from "../utils/auth";
 
 // Use proxy in development, full URL in production
 const getBaseUrl = () => {
@@ -16,27 +16,38 @@ const api = axios.create({
 });
 
 let isRedirecting = false;
+let refreshPromise: Promise<boolean> | null = null;
 
-api.interceptors.request.use((config) => {
-  const token = getValidToken();
-  if (token) {
-    config.headers = config.headers || {};
-    if (!config.headers.Authorization) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+const attemptRefresh = async () => {
+  if (!refreshPromise) {
+    refreshPromise = refreshSession().finally(() => {
+      refreshPromise = null;
+    });
   }
-  return config;
-});
+  return refreshPromise;
+};
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const status = error?.response?.status;
     const url = error?.config?.url || "";
-    if (status === 401 && !url.includes("/login") && !url.includes("/logout") && !isRedirecting) {
-      isRedirecting = true;
-      clearAuthCookies();
-      redirectToLogin();
+    if (
+      status === 401 &&
+      !url.includes("/login") &&
+      !url.includes("/logout") &&
+      !url.includes("/refresh") &&
+      !(error?.config as any)?._retry
+    ) {
+      (error.config as any)._retry = true;
+      const refreshed = await attemptRefresh();
+      if (refreshed) {
+        return api(error.config);
+      }
+      if (!isRedirecting) {
+        isRedirecting = true;
+        redirectToLogin();
+      }
     }
     return Promise.reject(error);
   }
