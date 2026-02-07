@@ -111,8 +111,8 @@ const PostList: React.FC = () => {
 
       await api.delete(`/posts/${postId}`);
 
-      // Remove the deleted post from the local state
-      setPosts(posts.filter(post => post.id !== postId));
+      // Remove the deleted post from the latest state
+      setPosts((prev) => prev.filter((post) => post.id !== postId));
     } catch (err: any) {
       console.error("Error deleting post:", err);
       if (err.response?.data?.error === "Authorization header is required") {

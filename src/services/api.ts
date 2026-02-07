@@ -15,6 +15,8 @@ const api = axios.create({
   timeout: 10000,
 });
 
+let isRedirecting = false;
+
 api.interceptors.request.use((config) => {
   const token = getValidToken();
   if (token) {
@@ -31,7 +33,8 @@ api.interceptors.response.use(
   (error) => {
     const status = error?.response?.status;
     const url = error?.config?.url || "";
-    if (status === 401 && !url.includes("/login") && !url.includes("/logout")) {
+    if (status === 401 && !url.includes("/login") && !url.includes("/logout") && !isRedirecting) {
+      isRedirecting = true;
       clearAuthCookies();
       redirectToLogin();
     }
