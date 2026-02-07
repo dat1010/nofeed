@@ -1,20 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getValidToken, redirectToLogin } from "../utils/auth";
+import { redirectToLogin, refreshSession } from "../utils/auth";
 import Logo from "../components/Logo";
+
+const getApiBaseUrl = () => {
+  if (process.env.NODE_ENV === "development") {
+    return "/api";
+  }
+  return "https://api.nofeed.zone/api";
+};
 
 const LandingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   
-  // Redirect to /home if id_token cookie is present and accessible via JS
+  // Redirect to /home if access_token cookie is valid (server-checked)
   useEffect(() => {
     // Only redirect if we're exactly on the root path
     if (window.location.pathname === "/" || window.location.pathname === "") {
-      const token = getValidToken();
-      if (token) {
-        navigate("/home");
-      }
+      const checkAuth = async () => {
+        try {
+          const res = await fetch(`${getApiBaseUrl()}/me`, {
+            credentials: "include",
+          });
+          if (res.ok) {
+            navigate("/home");
+            return;
+          }
+          const refreshed = await refreshSession();
+          if (refreshed) {
+            const res2 = await fetch(`${getApiBaseUrl()}/me`, {
+              credentials: "include",
+            });
+            if (res2.ok) {
+              navigate("/home");
+            }
+          }
+        } catch {
+          // no-op, stay on landing
+        }
+      };
+      checkAuth();
     }
   }, [navigate]);
 

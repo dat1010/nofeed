@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
-import { jwtDecode } from "jwt-decode";
-import { getValidToken, redirectToLogin } from "../utils/auth";
 import "../styles/feed.css";
 
 interface Post {
@@ -17,49 +15,20 @@ interface Post {
   updated_at?: string;
 }
 
-interface JwtPayload {
-  sub: string;
-  iss?: string;
-  aud?: string;
-  exp?: number;
-  iat?: number;
-}
-
 const fetchPosts = async (
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>,
   setError: React.Dispatch<React.SetStateAction<string | null>>,
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  authorId: string | null
 ) => {
   setIsLoading(true);
 
   try {
-    // 1. Get the raw token
-    const raw = getValidToken();
-    if (!raw) {
-      setError("Session expired. Redirecting to login.");
-      setIsLoading(false);
-      redirectToLogin();
-      return;
-    }
-
-    // 2. Decode it
-    let auth0UserId = null;
-    if (raw) {
-      try {
-        const decoded = jwtDecode<JwtPayload>(raw);
-        auth0UserId = decoded.sub;
-      } catch (decodeError) {
-        console.error("Error decoding JWT:", decodeError);
-      }
-    }
-
-    // 3. Build params
     const params: Record<string, string> = {};
-    if (auth0UserId) {
-      params.author = auth0UserId;
+    if (authorId) {
+      params.author = authorId;
     }
 
-    // 4. Fetch with ?author=<userId>
     const response = await api.get<Post[]>("/posts", { params });
     const postsData = response.data || [];
 
@@ -81,20 +50,18 @@ const PostList: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const raw = getValidToken();
-    if (!raw) {
-      redirectToLogin();
-      return;
-    }
-
-    try {
-      const decoded = jwtDecode<JwtPayload>(raw);
-      setCurrentUserId(decoded.sub);
-    } catch (decodeError) {
-      console.error("Error decoding JWT:", decodeError);
-    }
-
-    fetchPosts(setPosts, setError, setIsLoading);
+    const load = async () => {
+      let userId: string | null = null;
+      try {
+        const me = await api.get("/me");
+        userId = me.data?.user_id || me.data?.auth0_user_id || me.data?.sub || null;
+      } catch {
+        userId = null;
+      }
+      setCurrentUserId(userId);
+      fetchPosts(setPosts, setError, setIsLoading, userId);
+    };
+    load();
   }, []);
 
   const handleDeletePost = async (postId: string) => {
@@ -103,23 +70,17 @@ const PostList: React.FC = () => {
     }
 
     try {
-      const token = getValidToken();
-      if (!token) {
-        redirectToLogin();
-        return;
-      }
-
       await api.delete(`/posts/${postId}`);
 
       // Remove the deleted post from the latest state
       setPosts((prev) => prev.filter((post) => post.id !== postId));
     } catch (err: any) {
       console.error("Error deleting post:", err);
-      if (err.response?.data?.error === "Authorization header is required") {
+      if (err.response?.status === 401) {
         alert("You can only delete your own posts.");
-      } else {
-        alert("Failed to delete post. Please try again.");
+        return;
       }
+      alert("Failed to delete post. Please try again.");
     }
   };
 

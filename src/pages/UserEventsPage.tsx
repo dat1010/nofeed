@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
-import { getValidToken, redirectToLogin } from '../utils/auth';
 import api from '../services/api';
 
 interface Event {
@@ -21,11 +20,6 @@ const UserEventsPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = getValidToken();
-        if (!token) {
-          redirectToLogin();
-          return;
-        }
         const response = await api.get('/events', {
           headers: {
             'accept': 'application/json',

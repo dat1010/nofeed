@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { getValidToken, redirectToLogin } from '../utils/auth';
 import api from '../services/api';
 
 interface EventFormData {
@@ -225,12 +224,6 @@ const CreateEventPage: React.FC = () => {
     setError(null);
 
     try {
-      const token = getValidToken();
-      if (!token) {
-        redirectToLogin();
-        return;
-      }
-
       // Parse the payload string to ensure it's valid JSON
       let parsedPayload;
       try {

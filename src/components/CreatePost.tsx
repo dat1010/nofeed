@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import api from "../services/api";
-import { getValidToken, redirectToLogin } from "../utils/auth";
 
 interface CreatePostProps {
   onPostCreated: () => void;
@@ -23,12 +22,6 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
     setIsSubmitting(true);
     try {
       const title = generateTitle(content);
-      const token = getValidToken();
-      if (!token) {
-        redirectToLogin();
-        return;
-      }
-
       await api.post("/posts", {
         title,
         content
