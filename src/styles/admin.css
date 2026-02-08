@@ -1,7 +1,7 @@
 .admin-shell .menu {
-  background: var(--surface-1);
+  background: linear-gradient(180deg, rgba(19, 22, 42, 0.92), rgba(15, 18, 34, 0.92));
   border: 1px solid var(--border-1);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 1.25rem;
   box-shadow: none;
   backdrop-filter: blur(6px);
@@ -16,7 +16,7 @@
 
 .admin-shell .menu-list a {
   color: var(--text-0);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   padding: 0.6rem 0.8rem;
   transition: background 0.2s ease, transform 0.2s ease;
 }
@@ -27,9 +27,9 @@
 }
 
 .admin-card {
-  background: var(--surface-1);
+  background: linear-gradient(180deg, rgba(19, 22, 42, 0.92), rgba(15, 18, 34, 0.92));
   border: 1px solid var(--border-1);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: none;
   backdrop-filter: blur(8px);
 }

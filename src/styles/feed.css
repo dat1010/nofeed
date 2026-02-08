@@ -18,9 +18,9 @@
 }
 
 .post-card {
-  background: var(--surface-1);
+  background: linear-gradient(180deg, rgba(19, 22, 42, 0.92), rgba(15, 18, 34, 0.92));
   border: 1px solid var(--border-1);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   box-shadow: none;
   backdrop-filter: blur(6px);
   transition: transform 0.2s ease, border-color 0.2s ease;
@@ -94,15 +94,15 @@
 }
 
 .composer-card {
-  background: var(--surface-2);
-  border: 1px dashed rgba(123, 178, 255, 0.16);
-  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(18, 21, 40, 0.95), rgba(16, 19, 36, 0.92));
+  border: 1px dashed rgba(123, 178, 255, 0.14);
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   box-shadow: none;
 }
 
 .composer-textarea {
-  background: var(--surface-1);
+  background: rgba(14, 16, 30, 0.9);
   border: 1px solid var(--border-1);
   color: var(--text-0);
   border-radius: 14px;
@@ -124,9 +124,9 @@
 }
 
 .empty-state {
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 2rem;
-  background: var(--surface-2);
+  background: linear-gradient(180deg, rgba(20, 22, 42, 0.9), rgba(16, 18, 34, 0.92));
   border: 1px solid var(--border-1);
   box-shadow: none;
   text-align: center;
