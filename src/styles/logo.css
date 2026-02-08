@@ -116,6 +116,13 @@
   transform: translateY(-1px);
 }
 
+.navbar-icon.is-current-page {
+  color: #6df0c2 !important;
+  background: rgba(109, 240, 194, 0.12);
+  border-radius: 8px;
+  font-weight: 600;
+}
+
 .navbar-brand .logo-text {
   font-family: "Fraunces", serif;
   letter-spacing: 0.6px;
