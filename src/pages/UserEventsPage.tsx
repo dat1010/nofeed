@@ -48,19 +48,25 @@ const UserEventsPage: React.FC = () => {
                   {events.length === 0 ? (
                     <div className="notification is-info">No events found.</div>
                   ) : (
-                    <ul>
-                      {events.map(event => (
-                        <li key={event.id} className="mb-4">
-                          <div className="card admin-card">
-                            <div className="card-content">
-                              <strong>{event.name}</strong>
-                              <p>{event.description}</p>
-                              <span className="tag is-light">Schedule: {event.schedule}</span>
+                    <div className="feed">
+                      {events.map((event) => (
+                        <div key={event.id} className="card post-card mb-5">
+                          <div className="card-content">
+                            <div className="post-meta">
+                              <div className="post-avatar">E</div>
+                              <div>
+                                <div className="post-author">{event.name}</div>
+                                <div className="post-time">Scheduled</div>
+                              </div>
                             </div>
+                            <p className="has-text-weight-normal">{event.description}</p>
+                            <span className="tag is-light mt-3">
+                              Schedule: {event.schedule}
+                            </span>
                           </div>
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   )}
                 </>
               )}
