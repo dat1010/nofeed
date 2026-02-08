@@ -11,10 +11,13 @@ const roleOptions = ["superadmin", "member"];
 
 const AdminPage: React.FC = () => {
   const [users, setUsers] = useState<UserWithRole[]>([]);
+  const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newUserId, setNewUserId] = useState("");
   const [saving, setSaving] = useState<Record<string, boolean>>({});
+  const [deleting, setDeleting] = useState<Record<string, boolean>>({});
+  const [rowStatus, setRowStatus] = useState<Record<string, string | null>>({});
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -47,17 +50,43 @@ const AdminPage: React.FC = () => {
 
   const saveRole = async (auth0UserID: string, role: string) => {
     setSaving((prev) => ({ ...prev, [auth0UserID]: true }));
+    setRowStatus((prev) => ({ ...prev, [auth0UserID]: null }));
     setError(null);
     try {
       await api.patch(`/admin/users/${encodeURIComponent(auth0UserID)}/role`, {
         role,
       });
+      setRowStatus((prev) => ({ ...prev, [auth0UserID]: "Saved" }));
     } catch (err: any) {
       setError(err.response?.data?.error || "Failed to update role.");
+      setRowStatus((prev) => ({ ...prev, [auth0UserID]: "Error" }));
     } finally {
       setSaving((prev) => ({ ...prev, [auth0UserID]: false }));
     }
   };
+
+  const deleteUser = async (auth0UserID: string) => {
+    if (!window.confirm("Delete this user? This cannot be undone.")) {
+      return;
+    }
+    setDeleting((prev) => ({ ...prev, [auth0UserID]: true }));
+    setRowStatus((prev) => ({ ...prev, [auth0UserID]: null }));
+    setError(null);
+    try {
+      await api.delete(`/admin/users/${encodeURIComponent(auth0UserID)}`);
+      setUsers((prev) => prev.filter((u) => u.auth0_user_id !== auth0UserID));
+      setRowStatus((prev) => ({ ...prev, [auth0UserID]: "Deleted" }));
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Failed to delete user.");
+      setRowStatus((prev) => ({ ...prev, [auth0UserID]: "Error" }));
+    } finally {
+      setDeleting((prev) => ({ ...prev, [auth0UserID]: false }));
+    }
+  };
+
+  const filteredUsers = users.filter((u) =>
+    u.auth0_user_id.toLowerCase().includes(query.trim().toLowerCase())
+  );
 
   const createUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +121,17 @@ const AdminPage: React.FC = () => {
                   <div className="notification is-danger is-light">{error}</div>
                 )}
 
+                <div className="field">
+                  <div className="control">
+                    <input
+                      className="input"
+                      placeholder="Search by Auth0 user id"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                    />
+                  </div>
+                </div>
+
                 <form onSubmit={createUser} className="mb-5">
                   <div className="field is-grouped">
                     <div className="control is-expanded">
@@ -118,11 +158,12 @@ const AdminPage: React.FC = () => {
                       <tr>
                         <th>Auth0 User ID</th>
                         <th>Role</th>
+                        <th>Status</th>
                         <th></th>
                       </tr>
                     </thead>
                     <tbody>
-                      {users.map((u) => (
+                      {filteredUsers.map((u) => (
                         <tr key={u.auth0_user_id}>
                           <td>{u.auth0_user_id}</td>
                           <td>
@@ -141,6 +182,13 @@ const AdminPage: React.FC = () => {
                               </select>
                             </div>
                           </td>
+                          <td>
+                            {rowStatus[u.auth0_user_id] && (
+                              <span className="tag is-info">
+                                {rowStatus[u.auth0_user_id]}
+                              </span>
+                            )}
+                          </td>
                           <td className="has-text-right">
                             <button
                               className={`button is-link ${
@@ -149,6 +197,14 @@ const AdminPage: React.FC = () => {
                               onClick={() => saveRole(u.auth0_user_id, u.role || "member")}
                             >
                               Save
+                            </button>
+                            <button
+                              className={`button is-danger ml-2 ${
+                                deleting[u.auth0_user_id] ? "is-loading" : ""
+                              }`}
+                              onClick={() => deleteUser(u.auth0_user_id)}
+                            >
+                              Delete
                             </button>
                           </td>
                         </tr>
