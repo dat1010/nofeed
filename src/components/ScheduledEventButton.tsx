@@ -7,7 +7,7 @@ const ScheduledEventButton: React.FC = () => {
   return (
     <button 
       className="button is-primary"
-      onClick={() => navigate('/create-event')}
+      onClick={() => navigate('/admin/create-event')}
     >
       Create Scheduled Event
     </button>

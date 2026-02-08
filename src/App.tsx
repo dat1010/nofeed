@@ -97,7 +97,7 @@ function App() {
           } 
         />
         <Route 
-          path="/create-event" 
+          path="/admin/create-event" 
           element={
             <ProtectedRoute>
               <CreateEventPage />
@@ -105,7 +105,7 @@ function App() {
           } 
         />
         <Route 
-          path="/my-events" 
+          path="/admin/my-events" 
           element={
             <ProtectedRoute>
               <UserEventsPage />

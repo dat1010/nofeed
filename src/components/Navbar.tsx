@@ -40,12 +40,14 @@ const Navbar: React.FC = () => {
               </span>
               <span>Home</span>
             </a>
-            <a className="navbar-item has-text-white navbar-icon" href="/my-events">
-              <span className="icon">
-                <i className="fas fa-calendar-alt"></i>
-              </span>
-              <span>My Events</span>
-            </a>
+            {isAdmin && (
+              <a className="navbar-item has-text-white navbar-icon" href="/admin/my-events">
+                <span className="icon">
+                  <i className="fas fa-calendar-alt"></i>
+                </span>
+                <span>My Events</span>
+              </a>
+            )}
             {isAdmin && (
               <a className="navbar-item has-text-white navbar-icon" href="/admin">
                 <span className="icon">
@@ -64,9 +66,11 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="navbar-end">
-            <div className="navbar-item">
-              <ScheduledEventButton />
-            </div>
+            {isAdmin && (
+              <div className="navbar-item">
+                <ScheduledEventButton />
+              </div>
+            )}
             <div className="navbar-item">
               <div className="buttons">
                 <button className="button is-light" onClick={handleLogout}>
