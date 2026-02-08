@@ -18,18 +18,18 @@
 }
 
 .post-card {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: 18px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-1);
+  border-radius: 16px;
   box-shadow: none;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px);
   transition: transform 0.2s ease, border-color 0.2s ease;
   animation: cardIn 0.45s ease both;
 }
 
 .post-card:hover {
   transform: translateY(-1px);
-  border-color: rgba(123, 178, 255, 0.2);
+  border-color: var(--border-2);
 }
 
 .post-card:nth-child(1) { animation-delay: 0.02s; }
@@ -94,24 +94,24 @@
 }
 
 .composer-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px dashed rgba(123, 178, 255, 0.2);
-  border-radius: 20px;
+  background: var(--surface-2);
+  border: 1px dashed rgba(123, 178, 255, 0.16);
+  border-radius: 18px;
   padding: 1.5rem;
   box-shadow: none;
 }
 
 .composer-textarea {
-  background: rgba(15, 16, 32, 0.58);
-  border: 1px solid rgba(123, 178, 255, 0.16);
+  background: var(--surface-1);
+  border: 1px solid var(--border-1);
   color: var(--text-0);
   border-radius: 14px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .composer-textarea:focus {
-  border-color: rgba(123, 178, 255, 0.55);
-  box-shadow: 0 0 0 2px rgba(123, 178, 255, 0.18);
+  border-color: var(--border-2);
+  box-shadow: none;
 }
 
 .composer-footer {
@@ -124,11 +124,11 @@
 }
 
 .empty-state {
-  border-radius: 22px;
+  border-radius: 18px;
   padding: 2rem;
-  background: linear-gradient(140deg, rgba(123, 178, 255, 0.15), rgba(109, 240, 194, 0.1));
-  border: 1px solid rgba(123, 178, 255, 0.35);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  background: var(--surface-2);
+  border: 1px solid var(--border-1);
+  box-shadow: none;
   text-align: center;
 }
 

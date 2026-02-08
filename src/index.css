@@ -2,16 +2,20 @@
 
 :root {
   --bg-0: #0f1020;
-  --bg-1: #14162b;
-  --bg-2: #1b1f3a;
+  --bg-1: #13162a;
+  --bg-2: #1a1f35;
   --accent-1: #ff7a7a;
   --accent-2: #6df0c2;
   --accent-3: #7bb2ff;
   --text-0: #f4f6ff;
   --text-1: #c9d2ff;
   --text-2: #9aa6e6;
-  --card: rgba(255, 255, 255, 0.03);
-  --card-border: rgba(255, 255, 255, 0.08);
+  --card: rgba(255, 255, 255, 0.035);
+  --card-border: rgba(255, 255, 255, 0.07);
+  --surface-1: rgba(16, 18, 36, 0.75);
+  --surface-2: rgba(20, 22, 44, 0.6);
+  --border-1: rgba(255, 255, 255, 0.08);
+  --border-2: rgba(123, 178, 255, 0.16);
   --glow: none;
 }
 
@@ -25,9 +29,9 @@ body {
     "Segoe UI", sans-serif;
   color: var(--text-0);
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(125, 178, 255, 0.2), transparent 60%),
-    radial-gradient(900px 500px at 90% 0%, rgba(109, 240, 194, 0.18), transparent 60%),
-    linear-gradient(160deg, var(--bg-0), var(--bg-1) 45%, var(--bg-2));
+    radial-gradient(1000px 520px at 12% -8%, rgba(125, 178, 255, 0.16), transparent 60%),
+    radial-gradient(820px 480px at 90% 2%, rgba(109, 240, 194, 0.12), transparent 62%),
+    linear-gradient(160deg, var(--bg-0), var(--bg-1) 48%, var(--bg-2));
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -61,12 +65,12 @@ a {
   background: linear-gradient(135deg, #7bb2ff, #6df0c2);
   border: none;
   color: #0f1020;
-  box-shadow: 0 12px 26px rgba(109, 240, 194, 0.25);
+  box-shadow: none;
 }
 
 .button.is-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 16px 32px rgba(123, 178, 255, 0.35);
+  box-shadow: none;
 }
 
 .button.is-light {
@@ -86,12 +90,33 @@ a {
   background: linear-gradient(135deg, #ff7a7a, #7bb2ff);
   border: none;
   color: #0f1020;
-  box-shadow: 0 12px 26px rgba(255, 122, 122, 0.2);
+  box-shadow: none;
 }
 
 .button.is-link:hover {
   transform: translateY(-1px);
-  box-shadow: 0 16px 32px rgba(255, 122, 122, 0.35);
+  box-shadow: none;
+}
+
+input.input,
+textarea.textarea,
+select {
+  background: var(--surface-2);
+  border: 1px solid var(--border-1);
+  color: var(--text-0);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+input.input::placeholder,
+textarea.textarea::placeholder {
+  color: var(--text-2);
+}
+
+input.input:focus,
+textarea.textarea:focus,
+select:focus {
+  border-color: var(--border-2);
+  box-shadow: none;
 }
 
 .button.is-danger.is-light {
