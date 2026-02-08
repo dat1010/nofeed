@@ -8,6 +8,7 @@ import CreateEventPage from "./pages/CreateEventPage";
 import UserEventsPage from "./pages/UserEventsPage";
 import HealthCheckPage from "./pages/HealthCheckPage";
 import CommunityPage from "./pages/CommunityPage";
+import AdminPage from "./pages/AdminPage";
 import { redirectToLogin, refreshSession } from "./utils/auth";
 import "./styles/logo.css";
 
@@ -108,6 +109,14 @@ function App() {
           element={
             <ProtectedRoute>
               <UserEventsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute>
+              <AdminPage />
             </ProtectedRoute>
           } 
         />

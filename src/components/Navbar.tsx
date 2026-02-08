@@ -31,6 +31,12 @@ const Navbar: React.FC = () => {
               </span>
               <span>My Events</span>
             </a>
+            <a className="navbar-item has-text-white navbar-icon" href="/admin">
+              <span className="icon">
+                <i className="fas fa-user-shield"></i>
+              </span>
+              <span>Admin</span>
+            </a>
             <a className="navbar-item has-text-white navbar-icon" href="https://discourse.nofeed.zone/?utm_source=app&utm_medium=nav&utm_campaign=community" target="_blank" rel="noopener noreferrer">
               <span className="icon">
                 <i className="fas fa-comments"></i>
