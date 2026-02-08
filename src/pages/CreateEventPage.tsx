@@ -252,8 +252,8 @@ const CreateEventPage: React.FC = () => {
 
   return (
     <AdminLayout title="Create Scheduled Event">
-      <div className="columns is-centered">
-        <div className="column is-half">
+      <div className="columns">
+        <div className="column is-full">
           <div className="card">
             <div className="card-content">
                 {error && <div className="notification is-danger">{error}</div>}

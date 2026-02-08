@@ -37,8 +37,8 @@ const UserEventsPage: React.FC = () => {
 
   return (
     <AdminLayout title="My Events">
-      <div className="columns is-centered">
-        <div className="column is-half">
+      <div className="columns">
+        <div className="column is-full">
           <div className="card">
             <div className="card-content">
               {loading && <div>Loading events...</div>}
