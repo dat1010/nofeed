@@ -37,9 +37,9 @@ const UserEventsPage: React.FC = () => {
 
   return (
     <AdminLayout title="My Events">
-      <div className="columns is-centered">
-        <div className="column is-half">
-          <div className="card">
+      <div className="columns">
+        <div className="column is-full">
+          <div className="card admin-card">
             <div className="card-content">
               {loading && <div>Loading events...</div>}
               {error && <div className="notification is-danger">{error}</div>}
@@ -48,19 +48,25 @@ const UserEventsPage: React.FC = () => {
                   {events.length === 0 ? (
                     <div className="notification is-info">No events found.</div>
                   ) : (
-                    <ul>
-                      {events.map(event => (
-                        <li key={event.id} className="mb-4">
-                          <div className="card">
-                            <div className="card-content">
-                              <strong>{event.name}</strong>
-                              <p>{event.description}</p>
-                              <span className="tag is-light">Schedule: {event.schedule}</span>
+                    <div className="feed">
+                      {events.map((event) => (
+                        <div key={event.id} className="card post-card mb-5">
+                          <div className="card-content">
+                            <div className="post-meta">
+                              <div className="post-avatar">E</div>
+                              <div>
+                                <div className="post-author">{event.name}</div>
+                                <div className="post-time">Scheduled</div>
+                              </div>
                             </div>
+                            <p className="has-text-weight-normal">{event.description}</p>
+                            <span className="tag schedule-pill mt-3">
+                              Schedule: {event.schedule}
+                            </span>
                           </div>
-                        </li>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   )}
                 </>
               )}

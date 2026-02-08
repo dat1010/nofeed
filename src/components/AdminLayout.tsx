@@ -1,5 +1,6 @@
 import React from "react";
 import Navbar from "./Navbar";
+import "../styles/admin.css";
 
 type AdminLayoutProps = {
   title?: string;
@@ -10,7 +11,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ title, children }) => {
   return (
     <>
       <Navbar />
-      <div className="container mt-5">
+      <div className="container mt-5 admin-shell">
         <div className="columns">
           <div className="column is-one-quarter">
             <aside className="menu">
