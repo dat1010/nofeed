@@ -254,7 +254,7 @@ const CreateEventPage: React.FC = () => {
     <AdminLayout title="Create Scheduled Event">
       <div className="columns">
         <div className="column is-full">
-          <div className="card">
+          <div className="card admin-card">
             <div className="card-content">
                 {error && <div className="notification is-danger">{error}</div>}
                 <form onSubmit={handleSubmit}>

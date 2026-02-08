@@ -146,7 +146,9 @@ const AdminPage: React.FC = () => {
       {loading ? (
         <div>Loading users...</div>
       ) : (
-        <table className="table is-fullwidth is-striped">
+        <div className="card admin-card">
+          <div className="card-content">
+            <table className="table is-fullwidth is-striped admin-table">
           <thead>
             <tr>
               <th>Auth0 User ID</th>
@@ -203,7 +205,9 @@ const AdminPage: React.FC = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+            </table>
+          </div>
+        </div>
       )}
     </AdminLayout>
   );

@@ -39,7 +39,7 @@ const UserEventsPage: React.FC = () => {
     <AdminLayout title="My Events">
       <div className="columns">
         <div className="column is-full">
-          <div className="card">
+          <div className="card admin-card">
             <div className="card-content">
               {loading && <div>Loading events...</div>}
               {error && <div className="notification is-danger">{error}</div>}
@@ -51,7 +51,7 @@ const UserEventsPage: React.FC = () => {
                     <ul>
                       {events.map(event => (
                         <li key={event.id} className="mb-4">
-                          <div className="card">
+                          <div className="card admin-card">
                             <div className="card-content">
                               <strong>{event.name}</strong>
                               <p>{event.description}</p>

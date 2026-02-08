@@ -1,0 +1,54 @@
+.admin-shell .menu {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 1.25rem;
+  box-shadow: var(--glow);
+  backdrop-filter: blur(10px);
+}
+
+.admin-shell .menu-label {
+  color: var(--text-2);
+  font-size: 0.7rem;
+  letter-spacing: 0.16rem;
+  text-transform: uppercase;
+}
+
+.admin-shell .menu-list a {
+  color: var(--text-0);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.admin-shell .menu-list a:hover {
+  background: rgba(123, 178, 255, 0.18);
+  transform: translateX(2px);
+}
+
+.admin-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  box-shadow: var(--glow);
+  backdrop-filter: blur(12px);
+}
+
+.admin-table.table {
+  background: transparent;
+  color: var(--text-0);
+}
+
+.admin-table.table thead th {
+  color: var(--text-2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.admin-table.table td,
+.admin-table.table th {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.admin-table.table tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
