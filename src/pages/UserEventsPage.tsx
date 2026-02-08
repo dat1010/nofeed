@@ -60,7 +60,7 @@ const UserEventsPage: React.FC = () => {
                               </div>
                             </div>
                             <p className="has-text-weight-normal">{event.description}</p>
-                            <span className="tag is-light mt-3">
+                            <span className="tag schedule-pill mt-3">
                               Schedule: {event.schedule}
                             </span>
                           </div>
