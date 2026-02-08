@@ -102,8 +102,8 @@
 .navbar-enhanced {
   backdrop-filter: blur(18px);
   background: linear-gradient(120deg, rgba(16, 18, 38, 0.88), rgba(20, 22, 48, 0.92)) !important;
-  border-bottom: 1px solid rgba(123, 178, 255, 0.2);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(123, 178, 255, 0.12);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
 }
 
 /* Icon styling */
