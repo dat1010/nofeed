@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
+import AdminLayout from "../components/AdminLayout";
 import api from "../services/api";
 
 interface UserWithRole {
@@ -105,119 +105,107 @@ const AdminPage: React.FC = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="container mt-5">
-        <div className="columns is-centered">
-          <div className="column is-three-quarters">
-            <div className="card">
-              <div className="card-content">
-                <h1 className="title">Superadmin</h1>
-                <p className="subtitle is-6">
-                  Manage user roles (superadmin only)
-                </p>
+    <AdminLayout title="Superadmin">
+      <p className="subtitle is-6">
+        Manage user roles (superadmin only)
+      </p>
 
-                {error && (
-                  <div className="notification is-danger is-light">{error}</div>
-                )}
+      {error && (
+        <div className="notification is-danger is-light">{error}</div>
+      )}
 
-                <div className="field">
-                  <div className="control">
-                    <input
-                      className="input"
-                      placeholder="Search by Auth0 user id"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <form onSubmit={createUser} className="mb-5">
-                  <div className="field is-grouped">
-                    <div className="control is-expanded">
-                      <input
-                        className="input"
-                        placeholder="auth0|user_id"
-                        value={newUserId}
-                        onChange={(e) => setNewUserId(e.target.value)}
-                      />
-                    </div>
-                    <div className="control">
-                      <button className="button is-primary" type="submit">
-                        Add User
-                      </button>
-                    </div>
-                  </div>
-                </form>
-
-                {loading ? (
-                  <div>Loading users...</div>
-                ) : (
-                  <table className="table is-fullwidth is-striped">
-                    <thead>
-                      <tr>
-                        <th>Auth0 User ID</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredUsers.map((u) => (
-                        <tr key={u.auth0_user_id}>
-                          <td>{u.auth0_user_id}</td>
-                          <td>
-                            <div className="select">
-                              <select
-                                value={u.role || "member"}
-                                onChange={(e) =>
-                                  handleRoleChange(u.auth0_user_id, e.target.value)
-                                }
-                              >
-                                {roleOptions.map((r) => (
-                                  <option key={r} value={r}>
-                                    {r}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          </td>
-                          <td>
-                            {rowStatus[u.auth0_user_id] && (
-                              <span className="tag is-info">
-                                {rowStatus[u.auth0_user_id]}
-                              </span>
-                            )}
-                          </td>
-                          <td className="has-text-right">
-                            <button
-                              className={`button is-link ${
-                                saving[u.auth0_user_id] ? "is-loading" : ""
-                              }`}
-                              onClick={() => saveRole(u.auth0_user_id, u.role || "member")}
-                            >
-                              Save
-                            </button>
-                            <button
-                              className={`button is-danger ml-2 ${
-                                deleting[u.auth0_user_id] ? "is-loading" : ""
-                              }`}
-                              onClick={() => deleteUser(u.auth0_user_id)}
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </div>
-          </div>
+      <div className="field">
+        <div className="control">
+          <input
+            className="input"
+            placeholder="Search by Auth0 user id"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
         </div>
       </div>
-    </>
+
+      <form onSubmit={createUser} className="mb-5">
+        <div className="field is-grouped">
+          <div className="control is-expanded">
+            <input
+              className="input"
+              placeholder="auth0|user_id"
+              value={newUserId}
+              onChange={(e) => setNewUserId(e.target.value)}
+            />
+          </div>
+          <div className="control">
+            <button className="button is-primary" type="submit">
+              Add User
+            </button>
+          </div>
+        </div>
+      </form>
+
+      {loading ? (
+        <div>Loading users...</div>
+      ) : (
+        <table className="table is-fullwidth is-striped">
+          <thead>
+            <tr>
+              <th>Auth0 User ID</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredUsers.map((u) => (
+              <tr key={u.auth0_user_id}>
+                <td>{u.auth0_user_id}</td>
+                <td>
+                  <div className="select">
+                    <select
+                      value={u.role || "member"}
+                      onChange={(e) =>
+                        handleRoleChange(u.auth0_user_id, e.target.value)
+                      }
+                    >
+                      {roleOptions.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </td>
+                <td>
+                  {rowStatus[u.auth0_user_id] && (
+                    <span className="tag is-info">
+                      {rowStatus[u.auth0_user_id]}
+                    </span>
+                  )}
+                </td>
+                <td className="has-text-right">
+                  <button
+                    className={`button is-link ${
+                      saving[u.auth0_user_id] ? "is-loading" : ""
+                    }`}
+                    onClick={() => saveRole(u.auth0_user_id, u.role || "member")}
+                  >
+                    Save
+                  </button>
+                  <button
+                    className={`button is-danger ml-2 ${
+                      deleting[u.auth0_user_id] ? "is-loading" : ""
+                    }`}
+                    onClick={() => deleteUser(u.auth0_user_id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </AdminLayout>
   );
 };
 

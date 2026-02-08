@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import ScheduledEventButton from "./ScheduledEventButton";
 import Logo from "./Logo";
 import { redirectToLogout } from "../utils/auth";
 import api from "../services/api";
@@ -41,14 +40,6 @@ const Navbar: React.FC = () => {
               <span>Home</span>
             </a>
             {isAdmin && (
-              <a className="navbar-item has-text-white navbar-icon" href="/admin/my-events">
-                <span className="icon">
-                  <i className="fas fa-calendar-alt"></i>
-                </span>
-                <span>My Events</span>
-              </a>
-            )}
-            {isAdmin && (
               <a className="navbar-item has-text-white navbar-icon" href="/admin">
                 <span className="icon">
                   <i className="fas fa-user-shield"></i>
@@ -66,11 +57,6 @@ const Navbar: React.FC = () => {
           </div>
 
           <div className="navbar-end">
-            {isAdmin && (
-              <div className="navbar-item">
-                <ScheduledEventButton />
-              </div>
-            )}
             <div className="navbar-item">
               <div className="buttons">
                 <button className="button is-light" onClick={handleLogout}>

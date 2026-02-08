@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
+import AdminLayout from '../components/AdminLayout';
 import api from '../services/api';
 
 interface EventFormData {
@@ -251,14 +251,11 @@ const CreateEventPage: React.FC = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="container mt-5">
-        <div className="columns is-centered">
-          <div className="column is-half">
-            <div className="card">
-              <div className="card-content">
-                <h1 className="title">Create Scheduled Event</h1>
+    <AdminLayout title="Create Scheduled Event">
+      <div className="columns is-centered">
+        <div className="column is-half">
+          <div className="card">
+            <div className="card-content">
                 {error && <div className="notification is-danger">{error}</div>}
                 <form onSubmit={handleSubmit}>
                   <div className="field">
@@ -381,12 +378,11 @@ const CreateEventPage: React.FC = () => {
                     </div>
                   </div>
                 </form>
-              </div>
             </div>
           </div>
         </div>
       </div>
-    </>
+    </AdminLayout>
   );
 };
 
