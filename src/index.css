@@ -12,7 +12,7 @@
   --text-2: #9aa6e6;
   --card: rgba(255, 255, 255, 0.03);
   --card-border: rgba(255, 255, 255, 0.08);
-  --glow: 0 6px 18px rgba(123, 178, 255, 0.12);
+  --glow: none;
 }
 
 * {

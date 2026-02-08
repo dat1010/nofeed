@@ -3,8 +3,8 @@
   border: 1px solid var(--card-border);
   border-radius: 18px;
   padding: 1.25rem;
-  box-shadow: 0 6px 16px rgba(123, 178, 255, 0.1);
-  backdrop-filter: blur(8px);
+  box-shadow: none;
+  backdrop-filter: blur(6px);
 }
 
 .admin-shell .menu-label {
@@ -30,8 +30,8 @@
   background: var(--card);
   border: 1px solid var(--card-border);
   border-radius: 18px;
-  box-shadow: 0 8px 18px rgba(123, 178, 255, 0.12);
-  backdrop-filter: blur(10px);
+  box-shadow: none;
+  backdrop-filter: blur(8px);
 }
 
 .admin-table.table {
