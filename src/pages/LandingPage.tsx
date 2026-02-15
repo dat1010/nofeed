@@ -74,7 +74,7 @@ const LandingPage: React.FC = () => {
           </div>
           
           <h1 className="title is-1 has-text-white mb-4">Welcome to NoFeed</h1>
-          <p className="subtitle is-4 has-text-light mb-6 tagline-glow">An experimental social network that breaks free from endless feeds.</p>
+          <p className="subtitle is-4 has-text-light mb-6 tagline-glow">An experimental social network. Where you have no feeed, but you search for content.</p>
           
           <div className="buttons is-centered mt-5">
             <button 
@@ -112,7 +112,7 @@ const LandingPage: React.FC = () => {
           
           <div className="mt-6">
             <p className="has-text-light is-size-7 tagline-glow">
-              Break free from the algorithm. Connect meaningfully.
+              You are the algorithm.
             </p>
           </div>
           <div className="mt-3">
