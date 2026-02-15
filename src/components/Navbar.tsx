@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import Logo from "./Logo";
 import { redirectToLogout } from "../utils/auth";
 import api from "../services/api";
 
 const Navbar: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const load = async () => {
@@ -22,6 +24,11 @@ const Navbar: React.FC = () => {
     redirectToLogout();
   };
 
+  const navClass = ({ isActive }: { isActive: boolean }) =>
+    `navbar-item has-text-white navbar-icon${isActive ? " is-current-page" : ""}`;
+
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   return (
     <nav className="navbar is-primary navbar-enhanced" role="navigation" aria-label="main navigation">
       <div className="container">
@@ -33,19 +40,22 @@ const Navbar: React.FC = () => {
 
         <div className="navbar-menu">
           <div className="navbar-start">
-            <a className="navbar-item has-text-white navbar-icon" href="/home">
+            <NavLink className={navClass} to="/home">
               <span className="icon">
                 <i className="fas fa-home"></i>
               </span>
               <span>Home</span>
-            </a>
+            </NavLink>
             {isAdmin && (
-              <a className="navbar-item has-text-white navbar-icon" href="/admin">
+              <NavLink
+                className={`navbar-item has-text-white navbar-icon${isAdminRoute ? " is-current-page" : ""}`}
+                to="/admin"
+              >
                 <span className="icon">
                   <i className="fas fa-user-shield"></i>
                 </span>
                 <span>Admin</span>
-              </a>
+              </NavLink>
             )}
             <a className="navbar-item has-text-white navbar-icon" href="https://discourse.nofeed.zone/?utm_source=app&utm_medium=nav&utm_campaign=community" target="_blank" rel="noopener noreferrer">
               <span className="icon">
