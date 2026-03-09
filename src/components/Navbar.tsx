@@ -30,7 +30,11 @@ const Navbar: React.FC = () => {
   const isAdminRoute = location.pathname.startsWith("/admin");
 
   return (
-    <nav className="navbar is-primary navbar-enhanced" role="navigation" aria-label="main navigation">
+    <nav
+      className="navbar is-primary navbar-enhanced"
+      role="navigation"
+      aria-label="main navigation"
+    >
       <div className="container">
         <div className="navbar-brand">
           <div className="navbar-item brand">
@@ -57,12 +61,6 @@ const Navbar: React.FC = () => {
                 <span>Admin</span>
               </NavLink>
             )}
-            <a className="navbar-item has-text-white navbar-icon" href="https://discourse.nofeed.zone/?utm_source=app&utm_medium=nav&utm_campaign=community" target="_blank" rel="noopener noreferrer">
-              <span className="icon">
-                <i className="fas fa-comments"></i>
-              </span>
-              <span>Community Forum</span>
-            </a>
             {/* Add more navigation items here as needed */}
           </div>
 
@@ -84,4 +82,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;
