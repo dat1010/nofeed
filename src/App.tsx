@@ -7,7 +7,6 @@ import HomePage from "./pages/HomePage";
 import CreateEventPage from "./pages/CreateEventPage";
 import UserEventsPage from "./pages/UserEventsPage";
 import HealthCheckPage from "./pages/HealthCheckPage";
-import CommunityPage from "./pages/CommunityPage";
 import AdminPage from "./pages/AdminPage";
 import { redirectToLogin, refreshSession } from "./utils/auth";
 import "./styles/logo.css";
@@ -80,45 +79,37 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/healthcheck" element={<HealthCheckPage />} />
-        <Route 
-          path="/community" 
-          element={
-            <ProtectedRoute>
-              <CommunityPage />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/home" 
+        <Route
+          path="/home"
           element={
             <ProtectedRoute>
               <HomePage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/admin/create-event" 
+        <Route
+          path="/admin/create-event"
           element={
             <ProtectedRoute>
               <CreateEventPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/admin/my-events" 
+        <Route
+          path="/admin/my-events"
           element={
             <ProtectedRoute>
               <UserEventsPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
             <ProtectedRoute>
               <AdminPage />
             </ProtectedRoute>
-          } 
+          }
         />
         {/* Add other routes as needed */}
       </Routes>
