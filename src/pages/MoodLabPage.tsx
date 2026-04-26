@@ -137,8 +137,8 @@ const formatHour = (hour: number) => {
 const decreePresets = [
   {
     label: "Royal Decree",
-    subject: "By imperial decree: inspect the signal",
-    body: "Esteemed citizen,\n\nThe palace has observed a suspiciously interesting signal in the NoFeed observatory. Kindly inspect it with the appropriate level of drama.\n\nSigned,\nThe Department of Very Important Vibes",
+    subject: "NoFeed note: please review this signal",
+    body: "Hello,\n\nThe NoFeed observatory noticed a signal worth a quick review. Please take a look when you have a moment.\n\nThanks,\nNoFeed",
   },
   {
     label: "Trapdoor Memo",
@@ -390,7 +390,8 @@ const MoodLabPage: React.FC = () => {
         subject: emailSubject,
         text: emailText,
       });
-      setEmailStatus(`Decree delivered from ${res.data?.from || "testing@nofeed.zone"}. The palace is unbearable now.`);
+      const messageId = res.data?.message_id ? ` SES message id: ${res.data.message_id}.` : "";
+      setEmailStatus(`Decree accepted by SES from ${res.data?.from || "testing@nofeed.zone"}.${messageId} Check spam or delivery events next.`);
     } catch (err: any) {
       setEmailStatus(null);
       setError(err.response?.data?.error || "The royal courier tripped on the stairs.");
