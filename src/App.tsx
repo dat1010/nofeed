@@ -9,6 +9,7 @@ import UserEventsPage from "./pages/UserEventsPage";
 import HealthCheckPage from "./pages/HealthCheckPage";
 import CommunityPage from "./pages/CommunityPage";
 import AdminPage from "./pages/AdminPage";
+import MoodLabPage from "./pages/MoodLabPage";
 import { redirectToLogin, refreshSession } from "./utils/auth";
 import "./styles/logo.css";
 
@@ -95,6 +96,14 @@ function App() {
               <HomePage />
             </ProtectedRoute>
           } 
+        />
+        <Route
+          path="/lab"
+          element={
+            <ProtectedRoute>
+              <MoodLabPage />
+            </ProtectedRoute>
+          }
         />
         <Route 
           path="/admin/create-event" 

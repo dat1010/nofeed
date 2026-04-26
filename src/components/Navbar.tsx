@@ -46,6 +46,12 @@ const Navbar: React.FC = () => {
               </span>
               <span>Home</span>
             </NavLink>
+            <NavLink className={navClass} to="/lab">
+              <span className="icon">
+                <i className="fas fa-flask"></i>
+              </span>
+              <span>Mood Lab</span>
+            </NavLink>
             {isAdmin && (
               <NavLink
                 className={`navbar-item has-text-white navbar-icon${isAdminRoute ? " is-current-page" : ""}`}
