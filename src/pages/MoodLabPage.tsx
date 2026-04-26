@@ -80,6 +80,7 @@ const API_ENDPOINTS = [
   { method: "GET", path: "/moods/analytics/patterns", group: "analytics", use: "time and calendar patterns" },
   { method: "GET", path: "/events", group: "automation", use: "scheduled experiments" },
   { method: "POST", path: "/events", group: "automation", use: "create recurring prompts" },
+  { method: "POST", path: "/email", group: "signals", use: "send royal field memos" },
   { method: "GET", path: "/discord-ping", group: "signals", use: "test notification channel" },
   { method: "GET", path: "/admin/users", group: "admin", use: "role inventory" },
   { method: "POST", path: "/admin/users", group: "admin", use: "provision user" },
@@ -133,6 +134,24 @@ const formatHour = (hour: number) => {
   return `${display} ${suffix}`;
 };
 
+const decreePresets = [
+  {
+    label: "Royal Decree",
+    subject: "By imperial decree: inspect the signal",
+    body: "Esteemed citizen,\n\nThe palace has observed a suspiciously interesting signal in the NoFeed observatory. Kindly inspect it with the appropriate level of drama.\n\nSigned,\nThe Department of Very Important Vibes",
+  },
+  {
+    label: "Trapdoor Memo",
+    subject: "A tiny lever has been considered",
+    body: "Official memo:\n\nA lever was noticed. Nobody is saying what it does. Still, the current signal deserves review before anyone touches anything ornate.\n\nCarry on with unreasonable confidence.",
+  },
+  {
+    label: "Llama-Level Urgent",
+    subject: "Urgent, but make it stylish",
+    body: "Attention:\n\nThe mood lab has produced a reading with excellent cheekbones. Please review the attached context, nod once, and pretend this was your idea all along.",
+  },
+];
+
 const MoodLabPage: React.FC = () => {
   const [status, setStatus] = useState<LabStatus>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -154,6 +173,11 @@ const MoodLabPage: React.FC = () => {
   );
   const [automationStatus, setAutomationStatus] = useState<string | null>(null);
   const [discordStatus, setDiscordStatus] = useState<string | null>(null);
+  const [emailTo, setEmailTo] = useState("");
+  const [emailSubject, setEmailSubject] = useState(decreePresets[0].subject);
+  const [emailText, setEmailText] = useState(decreePresets[0].body);
+  const [emailStatus, setEmailStatus] = useState<string | null>(null);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   const analyticsParams = useMemo(
     () => ({
@@ -337,6 +361,41 @@ const MoodLabPage: React.FC = () => {
       setDiscordStatus(res.data?.message || res.data?.discord_status || "Discord signal sent.");
     } catch (err: any) {
       setDiscordStatus(err.response?.data?.error || "Discord ping failed.");
+    }
+  };
+
+  const applyDecreePreset = (preset: typeof decreePresets[number]) => {
+    const signalLine = activeTag ? `\n\nCurrent palace-approved signal: ${activeTag}.` : "";
+    setEmailSubject(preset.subject);
+    setEmailText(`${preset.body}${signalLine}`);
+  };
+
+  const sendRoyalEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const recipients = emailTo
+      .split(",")
+      .map((recipient) => recipient.trim())
+      .filter(Boolean);
+
+    if (recipients.length === 0 || sendingEmail) {
+      return;
+    }
+
+    setSendingEmail(true);
+    setEmailStatus(null);
+    setError(null);
+    try {
+      const res = await api.post("/email", {
+        to: recipients,
+        subject: emailSubject,
+        text: emailText,
+      });
+      setEmailStatus(`Decree delivered from ${res.data?.from || "testing@nofeed.zone"}. The palace is unbearable now.`);
+    } catch (err: any) {
+      setEmailStatus(null);
+      setError(err.response?.data?.error || "The royal courier tripped on the stairs.");
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -654,6 +713,65 @@ const MoodLabPage: React.FC = () => {
               ))}
               {posts.length === 0 && <p className="muted">No posts found.</p>}
             </div>
+          </article>
+
+          <article className="lab-panel lab-panel-wide imperial-dispatch">
+            <div className="panel-heading">
+              <div>
+                <p>post /email</p>
+                <h2>Imperial dispatch</h2>
+              </div>
+              <span>testing@nofeed.zone</span>
+            </div>
+
+            <div className="decree-presets" aria-label="Dispatch tone presets">
+              {decreePresets.map((preset) => (
+                <button key={preset.label} type="button" onClick={() => applyDecreePreset(preset)}>
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+
+            <form className="decree-form" onSubmit={sendRoyalEmail}>
+              <label>
+                Recipient court
+                <input
+                  className="input"
+                  value={emailTo}
+                  onChange={(e) => setEmailTo(e.target.value)}
+                  placeholder="person@example.com, advisor@example.com"
+                />
+              </label>
+              <label>
+                Subject, obviously
+                <input
+                  className="input"
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                />
+              </label>
+              <label className="decree-body">
+                Scroll of importance
+                <textarea
+                  className="textarea"
+                  value={emailText}
+                  onChange={(e) => setEmailText(e.target.value)}
+                  rows={6}
+                />
+              </label>
+              <div className="decree-footer">
+                <span>From the palace mailroom, with excessive posture.</span>
+                <button
+                  className={`button is-primary ${sendingEmail ? "is-loading" : ""}`}
+                  type="submit"
+                  disabled={sendingEmail || !emailTo.trim() || !emailSubject.trim() || !emailText.trim()}
+                >
+                  <span className="icon"><i className="fas fa-crown"></i></span>
+                  <span>Send decree</span>
+                </button>
+              </div>
+            </form>
+            {emailStatus && <p className="micro-status decree-status">{emailStatus}</p>}
           </article>
 
           <article className="lab-panel">

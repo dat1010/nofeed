@@ -579,6 +579,99 @@
   line-height: 1.35;
 }
 
+.imperial-dispatch {
+  position: relative;
+  background:
+    linear-gradient(135deg, rgba(255, 209, 102, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(38, 24, 45, 0.96), rgba(12, 15, 28, 0.94));
+  border-color: rgba(255, 209, 102, 0.22);
+}
+
+.imperial-dispatch::before {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 74px;
+  height: 74px;
+  border: 1px solid rgba(255, 209, 102, 0.22);
+  border-radius: 50%;
+  background:
+    linear-gradient(90deg, transparent 48%, rgba(255, 209, 102, 0.2) 49%, transparent 51%),
+    linear-gradient(0deg, transparent 48%, rgba(255, 209, 102, 0.2) 49%, transparent 51%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.decree-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.decree-presets button {
+  border: 1px solid rgba(255, 209, 102, 0.32);
+  border-radius: 999px;
+  padding: 0.42rem 0.7rem;
+  color: #ffe7aa;
+  background: rgba(255, 209, 102, 0.08);
+  cursor: pointer;
+  font-weight: 800;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.decree-presets button:hover {
+  transform: translateY(-1px) rotate(-1deg);
+  background: rgba(255, 209, 102, 0.16);
+}
+
+.decree-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.decree-form label {
+  color: var(--text-2);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+}
+
+.decree-form input,
+.decree-form textarea {
+  margin-top: 0.35rem;
+}
+
+.decree-body,
+.decree-footer {
+  grid-column: 1 / -1;
+}
+
+.decree-body textarea {
+  min-height: 154px;
+  color: #fff8df;
+  border-color: rgba(255, 209, 102, 0.2);
+  background:
+    linear-gradient(90deg, rgba(255, 209, 102, 0.08) 1px, transparent 1px),
+    rgba(16, 13, 30, 0.82);
+  background-size: 22px 100%;
+}
+
+.decree-footer {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.decree-footer span,
+.decree-status {
+  color: #ffe7aa;
+}
+
 .endpoint-map {
   margin-top: 1rem;
 }
@@ -644,12 +737,23 @@
   .lab-grid,
   .constellation-wrap,
   .microscope,
+  .decree-form,
   .endpoint-groups {
     grid-template-columns: 1fr;
   }
 
   .lab-panel-wide {
     grid-column: auto;
+  }
+
+  .decree-body,
+  .decree-footer {
+    grid-column: auto;
+  }
+
+  .decree-footer {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .lab-orbit {
