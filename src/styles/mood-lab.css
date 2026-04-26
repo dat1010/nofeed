@@ -177,51 +177,156 @@
   padding: 0.25rem 0.62rem;
 }
 
-.tag-maker {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.55rem;
-  margin-bottom: 0.85rem;
-}
-
-.tag-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  min-height: 44px;
-  margin-bottom: 0.85rem;
-}
-
-.mood-chip {
-  border: 1px solid rgba(123, 178, 255, 0.2);
-  border-radius: 999px;
-  padding: 0.45rem 0.75rem;
-  color: var(--text-1);
-  background: rgba(255, 255, 255, 0.045);
-  cursor: pointer;
-  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-}
-
-.mood-chip:hover,
-.mood-chip.is-selected {
-  transform: translateY(-1px);
-  color: #08111b;
-  border-color: transparent;
-  background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
-}
-
-.lab-note {
-  min-height: 96px;
-  resize: vertical;
-}
-
-.lab-actions,
-.entry-editor {
+.lab-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem;
   align-items: center;
   margin-top: 0.8rem;
+}
+
+.constellation-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  gap: 1rem;
+}
+
+.constellation {
+  position: relative;
+  min-height: 390px;
+  overflow: hidden;
+  border: 1px solid rgba(123, 178, 255, 0.13);
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at center, rgba(109, 240, 194, 0.12), transparent 52%);
+  background-size: 32px 32px, 32px 32px, auto;
+}
+
+.constellation::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border: 1px dashed rgba(109, 240, 194, 0.18);
+  border-radius: 50%;
+}
+
+.constellation-edge {
+  position: absolute;
+  z-index: 1;
+  height: 2px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(109, 240, 194, 0.85), rgba(123, 178, 255, 0.25));
+  pointer-events: none;
+}
+
+.constellation-node {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  min-height: 22px;
+  border: 1px solid rgba(109, 240, 194, 0.45);
+  border-radius: 50%;
+  color: var(--text-0);
+  background: radial-gradient(circle, rgba(109, 240, 194, 0.95), rgba(123, 178, 255, 0.72));
+  box-shadow: 0 0 24px rgba(109, 240, 194, 0.3);
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.constellation-node:hover,
+.constellation-node.is-active {
+  z-index: 3;
+  border-color: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 0 0 7px rgba(109, 240, 194, 0.12), 0 0 34px rgba(109, 240, 194, 0.5);
+  transform: translate(-50%, -50%) scale(1.09);
+}
+
+.constellation-node span {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 50%;
+  max-width: 120px;
+  overflow: hidden;
+  padding: 0.16rem 0.42rem;
+  border-radius: 999px;
+  color: var(--text-0);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(8, 11, 24, 0.78);
+  transform: translateX(-50%);
+}
+
+.constellation-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.constellation-inspector,
+.entry-detail {
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.constellation-inspector h3,
+.entry-detail h3 {
+  margin: 0;
+  color: var(--text-0);
+  font-size: 1.5rem;
+  line-height: 1.1;
+}
+
+.constellation-inspector > strong {
+  display: block;
+  margin-top: 1rem;
+  color: var(--accent-2);
+  font-family: "Fraunces", serif;
+  font-size: 3rem;
+  line-height: 0.9;
+}
+
+.constellation-inspector > span {
+  display: block;
+  margin: 0.4rem 0 1rem;
+  color: var(--text-2);
+  font-size: 0.82rem;
+}
+
+.related-tags,
+.specimen-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.related-tags button,
+.specimen-tags button {
+  border: 1px solid rgba(123, 178, 255, 0.22);
+  border-radius: 999px;
+  padding: 0.38rem 0.58rem;
+  color: var(--text-1);
+  background: rgba(255, 255, 255, 0.045);
+  cursor: pointer;
+}
+
+.related-tags b {
+  margin-left: 0.35rem;
+  color: var(--accent-2);
+}
+
+.related-tags small {
+  color: var(--text-2);
 }
 
 .micro-status,
@@ -271,6 +376,20 @@
   font-size: 0.9rem;
 }
 
+.frequency-row button {
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  color: var(--text-1);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .frequency-row > div {
   height: 9px;
   overflow: hidden;
@@ -295,6 +414,16 @@
   border: 1px solid var(--border-1);
   border-radius: var(--radius-sm);
   background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.transition-row:hover {
+  border-color: rgba(109, 240, 194, 0.28);
+  transform: translateX(2px);
 }
 
 .transition-row span {
@@ -334,6 +463,12 @@
   background: linear-gradient(180deg, var(--accent-3), var(--accent-2));
 }
 
+.microscope {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(260px, 1.1fr);
+  gap: 1rem;
+}
+
 .entry-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -342,7 +477,23 @@
   padding: 0.8rem;
   border: 1px solid var(--border-1);
   border-radius: var(--radius-md);
+  color: inherit;
   background: rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.entry-card:hover,
+.entry-card.is-active {
+  border-color: rgba(109, 240, 194, 0.3);
+  transform: translateY(-1px);
+}
+
+.entry-card > i {
+  color: var(--accent-2);
 }
 
 .entry-card strong,
@@ -356,6 +507,55 @@
   margin-top: 0.25rem;
   color: var(--text-2);
   font-size: 0.78rem;
+}
+
+.entry-detail p {
+  color: var(--text-1);
+  line-height: 1.5;
+}
+
+.entry-detail dl {
+  display: grid;
+  gap: 0.65rem;
+  margin: 1rem 0;
+}
+
+.entry-detail dl div {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.entry-detail dt {
+  color: var(--text-2);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.entry-detail dd {
+  margin: 0;
+  color: var(--text-0);
+}
+
+.nearby-notes {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.nearby-notes strong {
+  color: var(--accent-2);
+}
+
+.nearby-notes p,
+.nearby-notes span {
+  margin: 0;
+  padding: 0.6rem;
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius-sm);
+  color: var(--text-1);
+  background: rgba(255, 255, 255, 0.035);
 }
 
 .calendar-strip {
@@ -442,6 +642,8 @@
   .lab-hero,
   .lab-controls,
   .lab-grid,
+  .constellation-wrap,
+  .microscope,
   .endpoint-groups {
     grid-template-columns: 1fr;
   }

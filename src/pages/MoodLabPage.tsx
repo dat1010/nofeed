@@ -70,11 +70,11 @@ const API_ENDPOINTS = [
   { method: "PUT", path: "/posts/{id}", group: "field notes", use: "revise a sample" },
   { method: "DELETE", path: "/posts/{id}", group: "field notes", use: "remove noisy sample" },
   { method: "GET", path: "/mood-tags", group: "moods", use: "tag vocabulary" },
-  { method: "POST", path: "/mood-tags", group: "moods", use: "new custom variable" },
+  { method: "POST", path: "/mood-tags", group: "moods", use: "documented only; lab stays read-only" },
   { method: "GET", path: "/mood-entries", group: "moods", use: "raw mood observations" },
-  { method: "POST", path: "/mood-entries", group: "moods", use: "record an observation" },
+  { method: "POST", path: "/mood-entries", group: "moods", use: "documented only; lab stays read-only" },
   { method: "GET", path: "/mood-entries/{id}", group: "moods", use: "hydrate one observation" },
-  { method: "PUT", path: "/mood-entries/{id}", group: "moods", use: "revise observation tags or note" },
+  { method: "PUT", path: "/mood-entries/{id}", group: "moods", use: "documented only; lab stays read-only" },
   { method: "GET", path: "/moods/analytics/overview", group: "analytics", use: "frequency totals" },
   { method: "GET", path: "/moods/analytics/insights", group: "analytics", use: "co-occurrence and transitions" },
   { method: "GET", path: "/moods/analytics/patterns", group: "analytics", use: "time and calendar patterns" },
@@ -119,6 +119,20 @@ const getEntrySignal = (entry: MoodEntry) => {
   return entry.note || "untagged observation";
 };
 
+const getTimeValue = (value?: string) => {
+  if (!value) {
+    return Number.NaN;
+  }
+  return new Date(value).getTime();
+};
+
+const formatHour = (hour: number) => {
+  const normalized = ((hour % 24) + 24) % 24;
+  const suffix = normalized >= 12 ? "PM" : "AM";
+  const display = normalized % 12 || 12;
+  return `${display} ${suffix}`;
+};
+
 const MoodLabPage: React.FC = () => {
   const [status, setStatus] = useState<LabStatus>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -131,20 +145,15 @@ const MoodLabPage: React.FC = () => {
   const [overview, setOverview] = useState<MoodOverview | null>(null);
   const [insights, setInsights] = useState<MoodInsights | null>(null);
   const [patterns, setPatterns] = useState<MoodPatterns | null>(null);
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
-  const [newTagName, setNewTagName] = useState("");
-  const [entryNote, setEntryNote] = useState("");
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
   const [start, setStart] = useState(getDefaultStart);
   const [end, setEnd] = useState(getDefaultEnd);
   const [timezone, setTimezone] = useState(
     Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York"
   );
-  const [savingEntry, setSavingEntry] = useState(false);
-  const [creatingTag, setCreatingTag] = useState(false);
   const [automationStatus, setAutomationStatus] = useState<string | null>(null);
   const [discordStatus, setDiscordStatus] = useState<string | null>(null);
-  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
-  const [editingNote, setEditingNote] = useState("");
 
   const analyticsParams = useMemo(
     () => ({
@@ -156,7 +165,65 @@ const MoodLabPage: React.FC = () => {
   );
 
   const topTag = overview?.frequency?.[0];
+  const activeTag = selectedTag || topTag?.tag || tags[0]?.name || null;
   const totalSignals = (overview?.totalEntries || 0) + posts.length + events.length;
+  const constellation = useMemo(() => {
+    const rawNodes = insights?.cooccurrence?.nodes || [];
+    const frequency = overview?.frequency || [];
+    const fallbackNodes = frequency.map((item) => ({ id: item.tag, count: item.count }));
+    const nodes = (rawNodes.length > 0 ? rawNodes : fallbackNodes).slice(0, 12);
+    const maxCount = Math.max(1, ...nodes.map((node) => node.count || 0));
+    const radius = 42;
+
+    return nodes.map((node, index) => {
+      const angle = (Math.PI * 2 * index) / Math.max(1, nodes.length) - Math.PI / 2;
+      const pull = 0.72 + ((node.count || 0) / maxCount) * 0.28;
+      return {
+        ...node,
+        x: 50 + Math.cos(angle) * radius * pull,
+        y: 50 + Math.sin(angle) * radius * pull,
+        size: 16 + ((node.count || 0) / maxCount) * 28,
+      };
+    });
+  }, [insights, overview]);
+  const activeNode = constellation.find((node) => node.id === activeTag) || constellation[0];
+  const relatedEdges = useMemo(() => {
+    return (insights?.cooccurrence?.edges || []).filter(
+      (edge) => edge.source === activeTag || edge.target === activeTag
+    );
+  }, [activeTag, insights]);
+  const matchingEntries = useMemo(() => {
+    if (!activeTag) {
+      return entries;
+    }
+    return entries.filter((entry) => getTagNames(entry).includes(activeTag));
+  }, [activeTag, entries]);
+  const activeEntry = useMemo(() => {
+    return (
+      entries.find((entry) => entry.id === selectedEntryId) ||
+      matchingEntries[0] ||
+      entries[0] ||
+      null
+    );
+  }, [entries, matchingEntries, selectedEntryId]);
+  const nearbyPosts = useMemo(() => {
+    if (!activeEntry) {
+      return posts.slice(0, 3);
+    }
+    const entryTime = getTimeValue(activeEntry.createdAt);
+    if (Number.isNaN(entryTime)) {
+      return posts.slice(0, 3);
+    }
+    return [...posts]
+      .filter((post) => !Number.isNaN(getTimeValue(post.created_at)))
+      .sort((a, b) => Math.abs(getTimeValue(a.created_at) - entryTime) - Math.abs(getTimeValue(b.created_at) - entryTime))
+      .slice(0, 3);
+  }, [activeEntry, posts]);
+  const dominantHours = useMemo(() => {
+    const points = patterns?.timeOfDay || [];
+    const scoped = activeTag ? points.filter((point) => point.tag === activeTag) : points;
+    return [...scoped].sort((a, b) => b.count - a.count).slice(0, 3);
+  }, [activeTag, patterns]);
   const endpointsByGroup = useMemo(() => {
     return API_ENDPOINTS.reduce<Record<string, typeof API_ENDPOINTS>>((acc, endpoint) => {
       acc[endpoint.group] = acc[endpoint.group] || [];
@@ -206,7 +273,6 @@ const MoodLabPage: React.FC = () => {
     if (tagsResult.status === "fulfilled") {
       const nextTags = Array.isArray(tagsResult.value.data) ? tagsResult.value.data : [];
       setTags(nextTags);
-      setSelectedTagIds((prev) => prev.filter((id) => nextTags.some((tag) => tag.id === id)));
     }
     if (entriesResult.status === "fulfilled") {
       setEntries(Array.isArray(entriesResult.value.data) ? entriesResult.value.data : []);
@@ -240,76 +306,8 @@ const MoodLabPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analyticsParams]);
 
-  const toggleTag = (tagId: string) => {
-    setSelectedTagIds((prev) =>
-      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
-    );
-  };
-
-  const createTag = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const name = newTagName.trim();
-    if (!name || creatingTag) {
-      return;
-    }
-    setCreatingTag(true);
-    setError(null);
-    try {
-      const res = await api.post<MoodTag>("/mood-tags", { name });
-      setTags((prev) => [...prev, res.data]);
-      setSelectedTagIds((prev) => [...prev, res.data.id]);
-      setNewTagName("");
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Could not create that mood tag.");
-    } finally {
-      setCreatingTag(false);
-    }
-  };
-
-  const createEntry = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if ((selectedTagIds.length === 0 && !entryNote.trim()) || savingEntry) {
-      return;
-    }
-    setSavingEntry(true);
-    setError(null);
-    try {
-      await api.post<MoodEntry>("/mood-entries", {
-        note: entryNote.trim(),
-        tagIds: selectedTagIds,
-      });
-      setEntryNote("");
-      setSelectedTagIds([]);
-      await loadLab();
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Could not record the mood observation.");
-    } finally {
-      setSavingEntry(false);
-    }
-  };
-
-  const beginEdit = (entry: MoodEntry) => {
-    setEditingEntryId(entry.id);
-    setEditingNote(entry.note || "");
-  };
-
-  const updateEntry = async (entry: MoodEntry) => {
-    setError(null);
-    try {
-      await api.put(`/mood-entries/${encodeURIComponent(entry.id)}`, {
-        note: editingNote.trim(),
-        tagIds: (entry.tags || []).map((tag) => tag.id),
-      });
-      setEditingEntryId(null);
-      setEditingNote("");
-      await loadLab();
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Could not update that mood observation.");
-    }
-  };
-
   const createRhythmEvent = async () => {
-    const variable = topTag?.tag || tags[0]?.name || "mood-check";
+    const variable = activeTag || "mood-check";
     setAutomationStatus("creating");
     setError(null);
     try {
@@ -394,61 +392,83 @@ const MoodLabPage: React.FC = () => {
           <article className="lab-panel lab-panel-wide">
             <div className="panel-heading">
               <div>
-                <p>active instrument</p>
-                <h2>Record an observation</h2>
+                <p>read-only instrument</p>
+                <h2>Mood constellation</h2>
               </div>
-              <span>{tags.length} variables</span>
+              <span>{constellation.length || tags.length} variables</span>
             </div>
 
-            <form className="tag-maker" onSubmit={createTag}>
-              <input
-                className="input"
-                value={newTagName}
-                onChange={(e) => setNewTagName(e.target.value)}
-                placeholder="Add variable: calm, wired, focused..."
-              />
-              <button className={`button is-light ${creatingTag ? "is-loading" : ""}`} type="submit">
-                <span className="icon"><i className="fas fa-plus"></i></span>
-              </button>
-            </form>
-
-            <form onSubmit={createEntry}>
-              <div className="tag-cloud">
-                {tags.map((tag) => (
+            <div className="constellation-wrap">
+              <div className="constellation" aria-label="Mood co-occurrence graph">
+                {relatedEdges.map((edge, index) => {
+                  const source = constellation.find((node) => node.id === edge.source);
+                  const target = constellation.find((node) => node.id === edge.target);
+                  if (!source || !target) {
+                    return null;
+                  }
+                  const dx = target.x - source.x;
+                  const dy = target.y - source.y;
+                  const length = Math.sqrt(dx * dx + dy * dy);
+                  const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                  return (
+                    <span
+                      className="constellation-edge"
+                      key={`${edge.source}-${edge.target}-${index}`}
+                      style={{
+                        left: `${source.x}%`,
+                        top: `${source.y}%`,
+                        width: `${length}%`,
+                        transform: `rotate(${angle}deg)`,
+                        opacity: Math.min(0.9, 0.24 + edge.weight / 8),
+                      }}
+                    />
+                  );
+                })}
+                {constellation.map((node) => (
                   <button
-                    className={`mood-chip ${selectedTagIds.includes(tag.id) ? "is-selected" : ""}`}
-                    key={tag.id}
+                    className={`constellation-node ${node.id === activeTag ? "is-active" : ""}`}
+                    key={node.id}
                     type="button"
-                    onClick={() => toggleTag(tag.id)}
+                    onClick={() => {
+                      setSelectedTag(node.id);
+                      const firstEntry = entries.find((entry) => getTagNames(entry).includes(node.id));
+                      setSelectedEntryId(firstEntry?.id || null);
+                    }}
+                    style={{
+                      left: `${node.x}%`,
+                      top: `${node.y}%`,
+                      width: node.size,
+                      height: node.size,
+                    }}
+                    title={`${node.id}: ${node.count} observations`}
                   >
-                    {tag.name}
+                    <span>{node.id}</span>
                   </button>
                 ))}
-                {tags.length === 0 && <p className="muted">No mood tags yet. Create the first variable.</p>}
+                {constellation.length === 0 && <p className="muted constellation-empty">No co-occurrence signal yet.</p>}
               </div>
-
-              <textarea
-                className="textarea lab-note"
-                value={entryNote}
-                onChange={(e) => setEntryNote(e.target.value)}
-                placeholder="What changed in the system?"
-                rows={3}
-              />
-              <div className="lab-actions">
-                <button
-                  className={`button is-primary ${savingEntry ? "is-loading" : ""}`}
-                  type="submit"
-                  disabled={savingEntry || (selectedTagIds.length === 0 && !entryNote.trim())}
-                >
-                  <span className="icon"><i className="fas fa-flask"></i></span>
-                  <span>Log signal</span>
-                </button>
+              <aside className="constellation-inspector">
+                <p className="lab-kicker">selected variable</p>
+                <h3>{activeNode?.id || activeTag || "No signal"}</h3>
+                <strong>{activeNode?.count || topTag?.count || 0}</strong>
+                <span>observations in the graph</span>
+                <div className="related-tags">
+                  {relatedEdges.slice(0, 5).map((edge) => {
+                    const related = edge.source === activeTag ? edge.target : edge.source;
+                    return (
+                      <button key={`${edge.source}-${edge.target}`} type="button" onClick={() => setSelectedTag(related)}>
+                        {related}<b>{edge.weight}</b>
+                      </button>
+                    );
+                  })}
+                  {relatedEdges.length === 0 && <small>No co-occurring tags yet.</small>}
+                </div>
                 <button className="button is-light" type="button" onClick={createRhythmEvent}>
                   <span className="icon"><i className="fas fa-clock"></i></span>
-                  <span>Schedule rhythm</span>
+                  <span>Schedule review</span>
                 </button>
-              </div>
-            </form>
+              </aside>
+            </div>
             {automationStatus && <p className="micro-status">{automationStatus}</p>}
           </article>
 
@@ -482,7 +502,7 @@ const MoodLabPage: React.FC = () => {
             <div className="frequency-list">
               {(overview?.frequency || []).slice(0, 8).map((item) => (
                 <div className="frequency-row" key={item.tag}>
-                  <span>{item.tag}</span>
+                  <button type="button" onClick={() => setSelectedTag(item.tag)}>{item.tag}</button>
                   <div><i style={{ width: `${(item.count / maxFrequency) * 100}%` }} /></div>
                   <b>{item.count}</b>
                 </div>
@@ -500,12 +520,17 @@ const MoodLabPage: React.FC = () => {
             </div>
             <div className="transition-list">
               {(insights?.transitions || []).slice(0, 6).map((transition) => (
-                <div className="transition-row" key={`${transition.from}-${transition.to}`}>
+                <button
+                  className="transition-row"
+                  key={`${transition.from}-${transition.to}`}
+                  type="button"
+                  onClick={() => setSelectedTag(transition.to)}
+                >
                   <span>{transition.from}</span>
                   <i className="fas fa-arrow-right"></i>
                   <span>{transition.to}</span>
                   <b>{transition.count}</b>
-                </div>
+                </button>
               ))}
               {(insights?.transitions || []).length === 0 && <p className="muted">No transitions yet.</p>}
             </div>
@@ -534,30 +559,63 @@ const MoodLabPage: React.FC = () => {
           <article className="lab-panel lab-panel-wide">
             <div className="panel-heading">
               <div>
-                <p>mood entries</p>
-                <h2>Recent observations</h2>
+                <p>entry microscope</p>
+                <h2>Observation drawer</h2>
               </div>
+              <span>{matchingEntries.length} matches</span>
             </div>
-            <div className="entry-stack">
-              {entries.slice(0, 6).map((entry) => (
-                <div className="entry-card" key={entry.id}>
-                  <div>
-                    <strong>{getEntrySignal(entry)}</strong>
-                    <span>{entry.createdAt ? new Date(entry.createdAt).toLocaleString() : "time unknown"}</span>
-                  </div>
-                  {editingEntryId === entry.id ? (
-                    <div className="entry-editor">
-                      <input className="input" value={editingNote} onChange={(e) => setEditingNote(e.target.value)} />
-                      <button className="button is-primary" onClick={() => updateEntry(entry)}>Save</button>
+            <div className="microscope">
+              <div className="entry-stack">
+                {(matchingEntries.length > 0 ? matchingEntries : entries).slice(0, 7).map((entry) => (
+                  <button
+                    className={`entry-card ${activeEntry?.id === entry.id ? "is-active" : ""}`}
+                    key={entry.id}
+                    type="button"
+                    onClick={() => setSelectedEntryId(entry.id)}
+                  >
+                    <div>
+                      <strong>{getEntrySignal(entry)}</strong>
+                      <span>{entry.createdAt ? new Date(entry.createdAt).toLocaleString() : "time unknown"}</span>
                     </div>
-                  ) : (
-                    <button className="button is-light" onClick={() => beginEdit(entry)}>
-                      <span className="icon"><i className="fas fa-pen"></i></span>
+                    <i className="fas fa-microscope"></i>
+                  </button>
+                ))}
+                {entries.length === 0 && <p className="muted">No mood entries were returned for this window.</p>}
+              </div>
+
+              <aside className="entry-detail">
+                <p className="lab-kicker">active specimen</p>
+                <h3>{activeEntry ? getEntrySignal(activeEntry) : "No entry selected"}</h3>
+                <p>{activeEntry?.note || "No note attached to this observation."}</p>
+                <div className="specimen-tags">
+                  {(activeEntry?.tags || []).map((tag) => (
+                    <button key={tag.id} type="button" onClick={() => setSelectedTag(tag.name)}>
+                      {tag.name}
                     </button>
-                  )}
+                  ))}
                 </div>
-              ))}
-              {entries.length === 0 && <p className="muted">The notebook is empty. Log the first signal above.</p>}
+                <dl>
+                  <div>
+                    <dt>Recorded</dt>
+                    <dd>{activeEntry?.createdAt ? new Date(activeEntry.createdAt).toLocaleString() : "unknown"}</dd>
+                  </div>
+                  <div>
+                    <dt>Dominant hours</dt>
+                    <dd>
+                      {dominantHours.length > 0
+                        ? dominantHours.map((point) => `${formatHour(point.hour)} (${point.count})`).join(", ")
+                        : "not enough signal"}
+                    </dd>
+                  </div>
+                </dl>
+                <div className="nearby-notes">
+                  <strong>Nearest field notes</strong>
+                  {nearbyPosts.map((post) => (
+                    <p key={post.id}>{post.content || post.title || "Untitled note"}</p>
+                  ))}
+                  {nearbyPosts.length === 0 && <span>No nearby posts found.</span>}
+                </div>
+              </aside>
             </div>
           </article>
 
